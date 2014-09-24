@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% include '_summary.html' %}
+
+<div class="navigation">
+    <span class="branch-select outline-button">
+        <i class="fa fa-lg fa-code-fork"></i>
+        <em>branch:</em>
+        <strong>{{ ref }}</strong>
+        <i class="fa fa-caret-down"></i>
+    </span>
+    {% include '_breadcrumb.html' %}
+</div>
+
+{{ macros.commit_details(latest, preview=true) }}
+
+<div class="tree">
+    <ul class="tree-entries">
+        {% if request.view_args.path is defined %}
+        <li class="tree-entry tree-entry-parent">
+            <a href="{{ url_for('.tree', ref=ref, path=request.view_args.path|parentpath) }}" rel="nofollow" title="Go to parent directory">
+                ..
+            </a>
+        </li>        
+        {% endif %}
+        {% for entry in tree %}
+        <li class="tree-entry tree-entry-{{ entry.type }}">
+            <a href="{{ url_for('.' + entry.type, ref=ref, path=entry.path) }}">
+                {{ entry.name }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock content %}
+
+{% block post_body_script %}
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="{{ url_for('static', filename='js/ZeroClipboard.js') }}"></script>
+<script src="{{ url_for('static', filename='js/select2.js') }}"></script>
+<script>
+jQuery(function($) {
+    var client;
+
+    ZeroClipboard.config({
+        swfPath: "{{ url_for('static', filename='swf/ZeroClipboard.swf', external_=true) }}"
+    });
+
+    client = new ZeroClipboard($('.js-zeroclipboard'));
+
+    $('.branch-selector').select2({
+        placeholder: "Select a State",
+        allowClear: false
+    });
+});
+</script>
+{% endblock post_body_script %}

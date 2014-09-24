@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{%- from 'macros.html' import render_pagination with context -%}
+
+{% block content %}
+<div class="history">
+    {#{% for day in history|groupby('author_date')|reverse %}#}
+    {% for day in history|groupby('commit_date')|reverse %}
+    <div class="history-entries-title">
+        <i class="fa fa-dot-circle-o"></i>
+        Commits on
+        {{ day.grouper|formatdate(true) }}
+    </div>
+
+    <ol class="history-entries">
+        {#{% for entry in day.list|sort(attribute='author_time')|reverse %}#}
+        {% for entry in day.list %}
+        <li class="history-entry">
+            <a href="{{ url_for('.tree', ref=entry.id) }}" class="sha-block outline-button">
+                <i class="fa fa-code"></i>
+            </a>
+            <a href="{{ url_for('.commit', sha=entry.id) }}" class="sha-block outline-button">
+                {{ entry.id|shortsha }}
+            </a>
+            <button class="js-zeroclipboard sha-block outline-button zeroclipboard-button" data-clipboard-text="{{ entry.id }}" data-copied-hint="Copied!" type="button" aria-label="Copy the full SHA">
+                <i class="fa fa-clipboard"></i>
+            </button>
+
+            <img src="{{ url_for('avatar', name=entry.author.name) }}" class="avatar">
+
+            <p class="history-title">
+                <a href="{{ url_for('.commit', sha=entry.id) }}" title="{{ entry.message.raw_summary }}">
+                    {{ entry.message.summary|jiralink(entry.id, entry.message.raw_summary) }}
+                </a>
+
+                {% if entry.message.description %}
+                    <span class="hidden-text-expander inline">
+                        <label for="{{ entry.id }}-check">…</label>
+                    </span>
+                {% endif %}
+            </p>
+
+            <div class="commit-meta">
+                {{ macros.authorship_for_commit(entry) }}
+                {% if entry.committer.name != entry.author.name %}
+                {{ macros.committer_for_commit(entry) }}                
+                {% endif %}
+            </div>
+
+            {% if entry.message.description %}
+            <input type="checkbox" class="hidden-text-control" id="{{ entry.id }}-check">
+            <div class="hidden-text history-description">
+                <pre>{{ entry.message.description|jiralink }}</pre>
+            </div>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ol>
+    {% endfor %}
+</div>
+
+{{ render_pagination(pagination) }}
+
+{% endblock content %}
+
+{% block post_body_script %}
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="{{ url_for('static', filename='js/ZeroClipboard.js') }}"></script>
+<script>
+jQuery(function($) {
+    var client;
+
+    ZeroClipboard.config({
+        swfPath: "{{ url_for('static', filename='swf/ZeroClipboard.swf', external_=true) }}"
+    });
+
+    client = new ZeroClipboard($('.js-zeroclipboard'));
+
+    // $('.history').on('click', '.hidden-text-expander', function(event) {
+    //     event.preventDefault();
+    //     $(this).parents('.history-entry').toggleClass('open');
+    //     return false;
+    // });
+});
+</script>
+{% endblock post_body_script %}

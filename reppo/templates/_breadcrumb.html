@@ -1,0 +1,24 @@
+<div class="breadcrumb">
+    {#
+    <select class="branch-selector">
+        {% for branch in g.repo.branches %}
+        <option value="{{ branch }}"{{ ' selected' if branch == ref else '' }}>
+            {{ branch }}
+        </option>
+        {% endfor %}
+    </select>
+    #}
+    <a class="repo-root" href="{{ url_for('.tree_no_ref') }}">
+        {{ g.repo.name }}
+    </a>
+    {% for pth in path %}
+        <span class="separator">/</span>
+        {% if not loop.last %}
+        <a href="{{ url_for('.tree', ref=ref, path=path[:loop.index]|join('/')) }}">
+            {{ pth }}
+        </a>
+        {% else %}
+        <strong>{{ pth }}</strong>
+        {% endif %}
+    {% endfor %}
+</div>

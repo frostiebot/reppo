@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="refs">
+{% for ref in refs %}
+    {% if loop.first %}
+    <div class="ref default-ref">
+        Default:
+        <a href="{{ url_for('.tree', ref=ref) }}">{{ ref }}</a>
+    </div>
+
+    <hr>
+    {% else %}
+    <div class="ref">
+        <a href="{{ url_for('.tree', ref=ref) }}">{{ ref }}</a>
+    </div>
+    {% endif %}
+{% endfor %}
+</div>
+{% endblock content %}

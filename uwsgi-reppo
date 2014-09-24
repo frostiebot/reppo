@@ -1,0 +1,34 @@
+#!/usr/local/bin/bash
+
+start_reppo() {
+    uwsgi --yaml /home/chris/hosted/reppo/conf/uwsgi.conf
+}
+
+stop_reppo() {
+    uwsgi --stop /tmp/uwsgi_reppo.pid
+}
+
+reload_reppo() {
+    uwsgi --reload /tmp/uwsgi_reppo.pid
+}
+
+test_reppo() {
+    cd /home/chris/hosted/reppo
+    nosetests -s --verbosity=2
+}
+
+coverage_reppo() {
+    cd /home/chris/hosted/reppo
+    nosetests -c ./nose.cfg
+}
+
+case "$1" in
+    start) start_reppo ;;
+    stop) stop_reppo ;;
+    reload) reload_reppo ;;
+    test) test_reppo ;;
+    coverage) coverage_reppo ;;
+    *) echo "usage: $0 start|stop|reload|test|coverage" >&2
+        exit 1
+        ;;
+esac

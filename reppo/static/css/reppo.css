@@ -1,0 +1,990 @@
+* {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box
+}
+
+html, body {
+    height: 100%;
+}
+
+body,input,select,textarea,button {
+    font: 13px/1.4 Helvetica, arial, freesans, clean, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+a {
+    color: #4183c4;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+header {
+    border-bottom: 1px solid #eee;
+    margin-bottom: 40px;
+}
+
+header h1 {
+    margin-bottom: 4px;
+    margin-top: 4px;
+}
+
+header i {
+    color: #bbb;
+    font-weight: normal;
+}
+
+footer {
+    background-color: #f7f7f7;
+    border-top: 1px solid #d8d8d8;
+    margin-top: 40px;
+}
+
+.attention {
+    background-color: #f7c8c8;
+    border: 1px solid #e9aeae;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    padding: 0 15px;
+}
+
+.commit-meta {
+    color: #999;
+}
+
+.jira-link {
+    color: #4183c4;
+    text-transform: uppercase;
+}
+
+.summary {
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 14px;
+    margin-bottom: 20px;
+    padding: 0 60px;
+    text-align: center;
+}
+
+.summary:before,
+.summary:after {
+    content: " ";
+    display: table;
+}
+
+.summary:after {
+    clear: both;
+}
+
+.summary a {
+    color: #999;
+    display: inline-block;
+    padding: 10px 30px;
+    text-decoration: none;
+}
+
+.summary a i {
+    opacity: 0.5;
+}
+
+.summary a strong {
+    color: #333;
+}
+
+.summary a:hover,
+.summary a:hover strong {
+    color: #4183c4;
+}
+
+/* navigation */
+
+.navigation {
+    margin: 10px 0;
+}
+.navigation:before,
+.navigation:after {
+    content: " ";
+    display: table;
+}
+
+.navigation:after {
+    clear: both;
+}
+
+/* branch select */
+
+.branch-select {
+    color: #333;
+    float: left;
+    margin-right: 10px;
+}
+
+.branch-select.outline-button {
+    font-weight: normal;
+    margin-left: 0;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.9);
+    cursor: pointer;
+    background-color: #eee;
+    background-image: -moz-linear-gradient(#fcfcfc, #eee);
+    background-image: -webkit-linear-gradient(#fcfcfc, #eee);
+    background-image: linear-gradient(#fcfcfc, #eee);
+    background-repeat: repeat-x;
+    border: 1px solid #d5d5d5;
+        -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-appearance: none
+}
+
+.branch-select.outline-button:hover {
+    text-decoration: none;
+    background-color: #ddd;
+    background-image: -moz-linear-gradient(#eee, #ddd);
+    background-image: -webkit-linear-gradient(#eee, #ddd);
+    background-image: linear-gradient(#eee, #ddd);
+    background-repeat: repeat-x;
+    border-color: #ccc
+}
+
+.branch-select.outline-button:active {
+    background-color: #dcdcdc;
+    background-image: none;
+    border-color: #b5b5b5;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
+}
+
+.branch-select em {
+    opacity: 0.6;
+    font-style: normal;
+}
+
+/* breadcrumb */
+
+.breadcrumb {
+    float: left;
+    font-size: 18px;
+    line-height: 32px;
+}
+
+.breadcrumb .repo-root {
+    font-weight: bold;
+}
+
+.separator {
+    font-weight: normal;
+    color: #999;
+}
+
+.breadcrumb a {
+    display: inline-block;
+}
+
+/* history */
+
+.history {
+    margin-bottom: 15px;
+    padding-left: 40px;
+    position: relative;
+}
+
+.history:before {
+    background-color: #f3f3f3;
+    bottom: 0;
+    content: "";
+    display: block;
+    left: 14px;
+    position: absolute;
+    top: 0;
+    width: 2px;
+    z-index: -1;
+}
+
+.history-entries-title {
+    color: #777;
+    margin-left: -30px;
+    margin-top: 15px;
+}
+
+.history-entries-title i {
+    background-color: #fff;
+    color: #ccc;
+    margin-right: 16px;
+    padding: 3px 0;
+}
+
+.history-entries {
+    border: 1px solid #d5d5d5;
+    border-radius: 2px;
+    list-style-type: none;
+    margin: 10px 0 0 0;
+    padding: 0;
+}
+
+.history-entry {
+    margin-bottom: 0;
+    padding: 8px 10px;
+}
+
+.history-entry:hover {
+    background-color: #f7fbfc;
+}
+
+.history-entry + .history-entry {
+    border-top: 1px solid #d5d5d5;
+}
+
+.history-title {
+    color: #333;
+    font-size: 15px;
+    font-weight: bold;
+    margin: 0 230px 0 44px;
+}
+
+.history-title a {
+    color: #4e575b;
+}
+
+.history-title .jira-link {
+    color: #4183c4;
+}
+
+.history .commit-meta {
+    font-size: 12px;
+    font-weight: normal;
+    margin-left: 44px;
+    margin-right: 230px;
+}
+
+.history .commit-author {
+    color: #777;
+    font-weight: normal;
+}
+
+.commit .authorship .committer:before,
+.history .committer:before {
+    color: #777;
+    content: '\f061';
+    display: inline-block;
+    font: normal normal 12px FontAwesome;
+    line-height: 1;
+    margin: 0 3px;
+    text-decoration: none;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.commit .authorship .committer:before {
+    color: #444;
+    margin: 0;
+}
+
+.history-description {
+    display: none;
+    margin-left: 44px;
+    margin-right: 230px;
+}
+
+.hidden-text-control {
+    display: none;
+    opacity: 0;
+}
+
+.commit-description.hidden-text {
+    display: none;
+}
+
+/*.history-entry.open .history-description {*/
+.hidden-text-control:checked ~ .hidden-text {
+    display: block;
+}
+
+.history-description pre {
+    border-left: 1px solid #e5e5e5;
+    color: #596063;
+    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 12px;
+    padding-left: 8px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    white-space: pre-wrap;
+}
+
+.pagination-container {
+    margin-top: 20px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.pagination {
+    display: inline-block;
+}
+
+.pagination:before,
+.pagination:after {
+    content: " ";
+    display: table;
+}
+
+.pagination:after {
+    clear: both;
+}
+
+.pagination a,
+.pagination span {
+    position: relative;
+    float: left;
+    margin-left: -1px;
+    font-size: 13px;
+    font-weight: bold;
+    font-style: normal;
+    padding: 7px 12px;
+    color: #4183c4;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.pagination a:first-child {
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    margin-left: 0;
+}
+
+.pagination a:last-child {
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.pagination a:hover {
+    background-color: #e7e7e7;
+    border-color: #e5e5e5;
+    text-decoration: none;
+}
+
+.pagination .disabled,
+.pagination .disabled:hover {
+    background-color: #fafafa;
+cursor: default;
+color: #d3d3d3;
+}
+
+.pagination span:first-child {
+    margin-left: 0;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+
+
+/** GOOD STUFF BELOW **/
+
+.container {
+    margin: 0 auto;
+    width: 940px;
+}
+
+.view-button {
+    background-color: #eee;
+    background-image: -moz-linear-gradient(#fcfcfc, #eee);
+    background-image: -webkit-linear-gradient(#fcfcfc, #eee);
+    background-image: linear-gradient(#fcfcfc, #eee);
+    background-repeat: repeat-x;
+    border: 1px solid #d5d5d5;
+    border-radius: 2px;
+    color: #333;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 0 10px;
+    line-height: 24px;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.9);
+    text-decoration: none;
+    vertical-align: middle;
+    white-space: nowrap;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-appearance: none;
+}
+
+.view-button:hover {
+    background-color: #ddd;
+    background-image: -moz-linear-gradient(#eee, #ddd);
+    background-image: -webkit-linear-gradient(#eee, #ddd);
+    background-image: linear-gradient(#eee, #ddd);
+    background-repeat: repeat-x;
+    border-color: #ccc;
+    text-decoration: none;
+}
+
+.view-button:active {
+    background-color: #dcdcdc;
+    background-image: none;
+    border-color: #b5b5b5;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
+}
+
+.outline-button {
+    border: 1px solid #e5e5e5;
+    border-radius: 3px;
+    display: block;
+    font-weight: bold;
+    margin-left: 10px;
+    padding: 5px 8px;
+    position: relative;
+    vertical-align: middle;
+}
+
+.outline-button + .outline-button {
+    border-radius: 0 3px 3px 0;
+    margin-left: -2px;
+}
+
+.outline-button + .outline-button + .outline-button {
+    border-radius: 3px 0 0 3px;
+}
+
+.outline-button .fa {
+    vertical-align: inherit;
+}
+
+.sha-block.outline-button {
+    background-color: #fff;
+    color: #4183c4;
+}
+
+.sha-block.outline-button:hover,
+.zeroclipboard-button.zeroclipboard-is-hover,
+.zeroclipboard-button.zeroclipboard-is-active {
+    background-color: #4183c4;
+    border-color: #4183c4;
+    color: #fff;
+    text-decoration: none;
+}
+
+.zeroclipboard-link {
+    background: none;
+    border: 0;
+    color: #4183c4;
+    cursor: pointer;
+    float: right;
+    /*margin: 0;*/
+    margin-top: -2px;
+    margin-left: 5px;
+    padding: 0;
+}
+
+.sha-block {
+    color: #888;
+    float: right;
+    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 12px;
+    margin-left: 15px;
+}
+.sha-block > a {
+    border-bottom: 1px dotted #ccc;
+    text-decoration: none;
+}
+
+.sha-block > a:hover {
+    border-bottom: 1px solid #444;
+}
+
+.sha-block > .sha {
+    color: #444;
+}
+
+.browse-button {
+    background-color: #ddecf3;
+    background-image: -moz-linear-gradient(#eff6f9, #ddecf3);
+    background-image: -webkit-linear-gradient(#eff6f9, #ddecf3);
+    background-image: linear-gradient(#eff6f9, #ddecf3);
+    background-repeat: repeat-x;
+    color: #4183c4;
+    float: right;
+    height: 26px;
+    padding: 0 10px;
+    margin: -3px -3px 0 0;
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 26px;
+    text-decoration: none;
+    text-shadow: 0 1px rgba(255,255,255,0.5);
+    border: 1px solid #cedee5;
+    border-radius: 3px
+}
+
+.hidden-text-expander {
+    display: block;
+}
+
+.hidden-text-expander.inline {
+    display: inline-block;
+    line-height: 0;
+    margin-left: 5px;
+    position: relative;
+    top: -1px;
+}
+
+.hidden-text-expander a,
+.hidden-text-expander label {
+    background: #ddd;
+    border-radius: 1px;
+    color: #555;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: bold;
+    height: 12px;
+    line-height: 6px;
+    padding: 0 5px;
+    text-decoration: none;
+    vertical-align: middle;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.hidden-text-expander a:hover,
+.hidden-text-expander label:hover {
+    background-color: #ccc;
+}
+
+.hidden-text-expander a:active,
+.hidden-text-expander label:active {
+    background-color: #4183c4;
+}
+
+.avatar {
+    border-radius: 3px;
+    display: inline-block;
+    line-height: 1;
+    overflow: hidden;
+    vertical-align: middle;
+}
+
+.history .avatar {
+    float: left;
+    margin-right: 8px;
+    height: 36px;
+    width: 36px;
+}
+
+.commit .avatar {
+    width: 24px;
+}
+
+.commit-preview .avatar {
+    margin: -2px 3px 0 0;
+    width: 20px;
+}
+
+.commit .authorship {
+    margin: -2px 0 -4px -4px;
+    font-size: 14px;
+}
+
+.commit-preview .authorship {
+    margin: -2px 0 -4px -4px;
+    font-size: 12px;
+}
+
+.commit .authorship .committer {
+    display: block;
+    font-size: 12px;
+    margin-top: -2px;
+    margin-left: 34px;
+}
+
+
+/* Commit Content */
+
+.commit {
+    background-color: #e6f1f6;
+    border: 1px solid #c5d5dd;
+    border-radius: 2px;
+    margin-bottom: 10px;
+    padding: 8px 8px 0;
+}
+
+.commit-preview {
+    margin-bottom: 0;
+    border-radius: 2px 2px 0 0;
+}
+
+.commit-preview .commit-title {
+    font-size: 13px;
+    font-weight: normal;
+    margin: 0 0 6px;
+}
+
+.commit-title {
+    color: #213f4d;
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0 0 8px;
+    text-shadow: 0 1px rgba(255,255,255,0.5);
+}
+
+.commit-title a {
+    color: #4e575b;
+}
+
+.commit-title .jira-link {
+    color: #4183c4;
+}
+
+.commit-description {
+    display: block;
+    margin: -5px 0 10px;
+}
+
+.commit-description pre {
+    color: #596063;
+    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 13px;
+    margin: 10px 0;
+    max-width: 100%;
+    overflow: visible;
+    text-shadow: 0 1px rgba(255, 255, 255, 0.5);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.commit-branches {
+    color: #818C90;
+    font-size: 12px;
+    margin-bottom: 8px;
+    margin-top: -6px;
+    vertical-align: middle;
+}
+
+.branches-list {
+    display: inline-block;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+}
+
+.branches-list li {
+    color: #596063;
+    display: inline-block;
+    font-weight: bold;
+}
+
+.branches-list li + li {
+    margin-left: 8px;
+}
+
+.branches-list li a {
+    color: inherit;
+}
+
+.commit-description + .commit-branches {
+    padding-top: 8px;
+    margin-top: 2px;
+    border-top: solid 1px #d1e2eb;
+}
+
+.commit .commit-meta {
+    background-color: #fff;
+    border-top: 1px solid #c5d5dd;
+    margin: 0 -8px 0;
+    padding: 8px;
+}
+
+.commit .commit-meta {
+    /*font-size: 14px;*/
+}
+
+.commit-preview .commit-meta {
+    /*font-size: 12px;*/
+}
+
+.commit .commit-author {
+    color: #444;
+}
+
+
+/* TOC (Content between Commit and Diffs) */
+
+.commit-diff-summary {
+    margin: 15px 0;
+}
+
+/*.commit-diff-summary .commit-diff-summary {
+    color: #333;
+    line-height: 26px
+}*/
+
+
+/* Tree Content */
+
+.tree {
+    /*border: 1px solid #ddd;*/
+    background-color: #f8f8f8;
+    margin-bottom: 15px;
+}
+
+.tree-entries {
+    border: solid #ddd;
+    border-width: 0 1px 1px;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.tree-entry {
+    line-height: 20px;
+    padding: 6px 10px;
+}
+
+.tree-entry + .tree-entry {
+    border-top: 1px solid #eee;
+}
+
+.tree-entry a {
+    color: #4183c4;
+    text-decoration: none;
+}
+
+.tree-entry a:hover {
+    text-decoration: underline;
+}
+
+.tree-entry:before {
+    display: inline-block;
+    font: normal normal 14px FontAwesome;
+    line-height: 1;
+    margin-right: 5px;
+    text-decoration: none;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.tree-entry-parent {
+    margin-left: 26px;
+}
+
+.tree-entry-tree:before {
+    color: #80a6cd;
+    content: '\f07b';
+    /*content: '\f114';*/
+}
+
+.tree-entry-blob:before {
+    color: #777;
+    content: '\f0f6';
+}
+
+
+/* Diff Content */
+
+.file {
+    border: 1px solid #d8d8d8;
+    border-radius: 2px 2px 0 0;
+    margin-bottom: 15px;
+    margin-top: 20px;
+}
+
+.file .meta {
+    background-color: #f7f7f7;
+    padding: 5px 10px;
+    text-shadow: 0 1px 0 #fff;
+}
+
+.file .meta:before,
+.file .meta:after {
+    content: " ";
+    display: table;
+}
+
+.file .meta:after {
+    clear: both;
+}
+
+.file .meta .info {
+    float: left;
+    height: 33px;
+    line-height: 34px;
+}
+
+.file .meta .actions {
+    float: right;
+    height: 33px;
+    line-height: 31px;
+}
+
+.diff-stat {
+    background-color: #fff;
+    border: 1px solid #d8d8d8;
+    border-radius: 4px;
+    color: #666;
+    cursor: default;
+    font-size: 11px;
+    font-weight: bold;
+    margin-right: 8px;
+    padding: 2px 2px 2px 4px;
+    text-align: center;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-appearance: none;
+}
+
+.diff-stat .additions {
+    color: #6cc644;
+}
+
+.diff-stat .deletions {
+    color: #bd2c00;
+}
+
+/* Base Blob Classes */
+
+.diff-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.diff-table {
+    border-top: 1px solid #d8d8d8;
+    border-collapse: separate;
+}
+
+.blob-num {
+    border: solid #e0e0e0;
+    border-width: 0 1px 0 0;
+    color: rgba(0,0,0,0.3);
+    cursor: pointer;
+    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 12px;
+    line-height: 18px;
+    min-width: 50px;
+    padding: 0 10px;
+    text-align: right;
+    vertical-align: top;
+    width: 1%;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.blob-code {
+    color: #333;
+    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 12px;
+    padding: 0 10px;
+    position: relative;
+    vertical-align: top;
+    white-space: pre;
+    overflow: visible;
+}
+
+.blob-code-separator {
+    background-color: #f8fafd;
+}
+
+
+/* Line Number Blob Extensions */
+
+.blob-num-separator {
+    background-color: #f0f5fa;
+    border-color: #d5e4f2;
+}
+
+.blob-num + .blob-num,
+.blob-num-separator {
+    box-shadow: inset -4px 0 6px -6px rgba(0,0,0,0.6)
+}
+
+.blob-num:before {
+    content: attr(data-line-number);
+}
+
+.blob-num:hover {
+    color: rgba(0,0,0,0.6);
+}
+
+
+/* Code Blob Additions */
+
+.blob-num-addition {
+    background-color: #ceffce;
+    border-color: #b4e2b4;
+}
+
+.blob-code-addition {
+    background-color: #dfd;
+}
+
+.blob-code-addition .x {
+    background-color: #77f177;
+}
+
+
+/* Code Blob Deletions */
+
+.blob-num-deletion {
+    background-color: #f7c8c8;
+    border-color: #e9aeae;    
+}
+
+.blob-code-deletion {
+    background-color: #fdd;
+}
+
+.blob-code-deletion .x {
+    background-color: #faa;
+}
+
+
+/* Selected Blobs */
+
+.selected.blob-num {
+    background-color: #f6e8b5;
+    border-color: #f0db88;    
+}
+
+.selected.blob-code {
+    background-color: #f8eec7;
+}

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ macros.commit_details(commit, branches, preview=false) }}
+
+{% include '_commit_diff_summary.html' %}
+
+<div class="files">
+    {% for change in changes if not change.is_header %}
+    <div class="file">
+        <div class="meta">
+            <div class="info">
+                <span class="diff-stat">
+                    <span class="additions">
+                        +{{ change.additions }}
+                    </span>
+                    <span class="deletions">
+                        -{{ change.deletions }}
+                    </span>
+                </span>
+                <span class="title" title="{{ change.new_filename or change.old_filename }}">
+                        {{ change.new_filename or change.old_filename }}
+                </span>
+            </div>
+            <div class="actions">
+                <a class="view-button" href="{{ url_for('.blob', ref=commit.id, path=change.new_filename or change.old_filename) }}">View</a>
+            </div>
+        </div>
+
+        <div class="diff-wrapper">
+            <table class="diff-table">
+                <tbody>
+                    {% for chunk in change.chunks %}
+                    {% set chunkloop = loop %}
+                    {% for blob in chunk %}
+                    <tr>
+                        <td class="blob-num blob-num-{{ blob.action }}" id="diff-{{ chunkloop.index }}-{{ loop.index }}L{{ blob.old_lineno or '' }}" data-line-number="{{ blob.old_lineno }}">
+                            {#<a href="#diff-{{ chunkloop.index }}-{{ loop.index }}L{{ blob.old_lineno }}">{{ blob.old_lineno }}</a>#}
+                        </td>
+                        <td class="blob-num blob-num-{{ blob.action }}" id="diff-{{ chunkloop.index }}-{{ loop.index }}R{{ blob.new_lineno or '' }}" data-line-number="{{ blob.new_lineno }}">
+                            {#<a href="#diff-{{ chunkloop.index }}-{{ loop.index }}R{{ blob.new_lineno }}">{{ blob.new_lineno }}</a>#}
+                        </td>
+                        <td class="blob-code blob-code-{{ blob.action }}">{{ blob.line|safe }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% if not loop.last %}
+                    <tr>
+                        <td class="blob-num blob-num-separator" colspan="2">&nbsp;</td>
+                        <td class="blob-code blob-code-separator"></td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock content %}

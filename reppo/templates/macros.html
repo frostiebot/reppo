@@ -1,0 +1,137 @@
+{% macro time_element(dt, tm) %}
+<time datetime="{{ dt }} {{ tm }}">on {{ dt|formatdate }}</time>
+{% endmacro %}
+
+{% macro object_for_commit(klass, obj_type, nm, dt, tm, avatar=false) %}
+<span class="{{ klass }}">
+    {% if avatar %}
+    <img src="{{ url_for('avatar', name=nm) }}" class="avatar">
+    {% endif %}
+    <strong class="commit-author">{{ nm }}</strong>
+    {{ obj_type }}
+    <time datetime="{{ dt }} {{ tm }}" title="{{ dt|formatdate(true) }} {{ tm }}">
+        on {{ dt|formatdate }}
+    </time>
+</span>
+{% endmacro %}
+
+{% macro committer_for_commit(commit, avatar=false) %}
+{{ object_for_commit('committer', 'committed', commit.committer.name, commit.commit_date, commit.commit_time, avatar) }}
+{% endmacro %}
+
+{% macro authorship_for_commit(commit, avatar=false) %}
+{{ object_for_commit('author', 'authored', commit.author.name, commit.author_date, commit.author_time, avatar) }}
+{% endmacro %}
+
+{% macro commit_details(commit, branches=none, preview=true) %}
+<div class="commit commit-{{ 'preview' if preview else 'full' }}">
+    {% if not preview %}
+    <a href="{{ url_for('.tree', ref=commit.id) }}" class="browse-button">Browse Code</a>
+    {% endif %}
+
+    <p class="commit-title">
+        {% if preview %}<a href="{{ url_for('.commit', sha=commit.id) }}">{% endif %}
+            {{ commit.message.summary|jiralink(latest.id if preview else none) }}
+        {% if preview %}</a>{% endif %}
+
+        {% if preview and commit.message.description %}
+        <span class="hidden-text-expander inline">
+            <label for="{{ commit.id }}-check">…</label>
+        </span>
+        {% endif %}
+    </p>
+
+    {% if commit.message.description %}
+    {% if preview %}<input type="checkbox" class="hidden-text-control" id="{{ commit.id }}-check">{% endif %}
+    <div class="commit-description{{ ' hidden-text' if preview else '' }}">
+        <pre>{{ commit.message.description|jiralink }}</pre>
+    </div>
+    {% endif %}
+
+    {% if branches %}
+    <div class="commit-branches">
+        <i class="fa fa-lg fa-code-fork"></i>
+        <ul class="branches-list">
+            {% for branch in branches|reverse %}
+            <li class="branch">
+                <a href="{{ url_for('.tree', ref=branch|trim) }}">{{ branch|trim }}</a>                
+            </li>
+            {% endfor %}            
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="commit-meta">
+        {% if preview %}
+        <button class="js-zeroclipboard zeroclipboard-link" data-clipboard-text="{{ latest.id }}" data-copied-hint="Copied!" type="button" aria-label="Copy the full SHA">
+            <i class="fa fa-clipboard"></i>
+        </button>
+
+        <a href="{{ url_for('.commit', sha=commit.id) }}" class="sha-block">
+            latest commit
+            <span class="sha">{{ commit.id|shortsha(10) }}</span>
+        </a>
+        {% else %}
+        <span class="sha-block">
+            commit
+            <span class="sha">{{ commit.id }}</span>
+        </span>
+
+        <span class="sha-block">
+            {{ commit.parents|count }}
+            parent
+            <a href="{{ url_for('.commit', sha=commit.parents[0]) }}" class="sha">{{ commit.parents[0]|shortsha }}</a>
+        </span>
+        {% endif %}
+
+        <div class="authorship">
+            {{ authorship_for_commit(commit, avatar=true) }}
+            {% if not preview and commit.committer.name != commit.author.name %}
+            {{ committer_for_commit(commit) }}
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endmacro %}
+
+{% macro render_pagination(pagination) %}
+<div class="pagination-container">
+    <div class="pagination">
+        {% if pagination.has_prev %}
+        <a href="{{ url_for_other_page(pagination.page - 1) }}" rel="nofollow">Newer</a>
+        {% else %}
+        <span class="disabled">Newer</span>
+        {% endif %}
+        {% if pagination.has_next %}
+        <a href="{{ url_for_other_page(pagination.page + 1)}}" rel="nofollow">Older</a>
+        {% else %}
+        <span class="disabled">Older</span>
+        {% endif %}
+    </div>    
+</div>
+{% endmacro %}
+
+{#
+{% macro render_pagination(pagination) %}
+<div class="pagination">
+    {% if pagination.has_prev %}
+    <a href="{{ url_for_other_page(pagination.page - 1) }}">&laquo; Prev</a>
+    {% endif %}
+    {%- for page in pagination.iter_pages() %}
+    {% if page %}
+    {% if page != pagination.page %}
+    <a href="{{ url_for_other_page(page) }}">{{ page }}</a>
+    {% else %}
+    <strong>{{ page }}</strong>
+    {% endif %}
+    {% else %}
+    <span class="ellipsis">…</span>
+    {% endif %}
+    {%- endfor %}
+    {% if pagination.has_next %}
+    <a href="{{ url_for_other_page(pagination.page + 1)}}">Next &raquo;</a>
+    {% endif %}
+</div>
+{% endmacro %}
+#}
