@@ -31,7 +31,7 @@
 
     <p class="commit-title">
         {% if preview %}<a href="{{ url_for('.commit', sha=commit.id) }}">{% endif %}
-            {{ commit.message.summary|jiralink(latest.id if preview else none) }}
+            {{ commit.message.summary|jiralink(commit.id if preview else none) }}
         {% if preview %}</a>{% endif %}
 
         {% if preview and commit.message.description %}
@@ -63,7 +63,7 @@
 
     <div class="commit-meta">
         {% if preview %}
-        <button class="js-zeroclipboard zeroclipboard-link" data-clipboard-text="{{ latest.id }}" data-copied-hint="Copied!" type="button" aria-label="Copy the full SHA">
+        <button class="js-zeroclipboard zeroclipboard-link" data-clipboard-text="{{ commit.id }}" data-copied-hint="Copied!" type="button" aria-label="Copy the full SHA">
             <i class="fa fa-clipboard"></i>
         </button>
 

@@ -2,6 +2,20 @@
 {%- from 'macros.html' import render_pagination with context -%}
 
 {% block content %}
+
+<div class="navigation">
+    {% if not request.view_args.path %}
+    <span class="branch-select outline-button">
+        <i class="fa fa-lg fa-code-fork"></i>
+        <em>branch:</em>
+        <strong>{{ request.view_args.ref }}</strong>
+        <i class="fa fa-caret-down"></i>
+    </span>
+    {% else %}
+    {% include '_breadcrumb.html' %}
+    {% endif %}
+</div>
+
 <div class="history">
     {#{% for day in history|groupby('author_date')|reverse %}#}
     {% for day in history|groupby('commit_date')|reverse %}

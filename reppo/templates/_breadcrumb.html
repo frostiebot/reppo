@@ -8,17 +8,22 @@
         {% endfor %}
     </select>
     #}
-    <a class="repo-root" href="{{ url_for('.tree_no_ref') }}">
+    {% if request.endpoint == 'repo.commits' %}
+    History for
+    {% endif %}
+    <a class="repo-root" href="{{ url_for('.tree') }}">
         {{ g.repo.name }}
     </a>
-    {% for pth in path %}
+    {% if request.view_args.path %}
+    {% for name, path in request.view_args.path|pathwalk %}
         <span class="separator">/</span>
         {% if not loop.last %}
-        <a href="{{ url_for('.tree', ref=ref, path=path[:loop.index]|join('/')) }}">
-            {{ pth }}
+        <a href="{{ url_for(request.endpoint, path=path) }}">
+            {{ name }}
         </a>
         {% else %}
-        <strong>{{ pth }}</strong>
+        <strong>{{ name }}</strong>
         {% endif %}
     {% endfor %}
+    {% endif %}
 </div>

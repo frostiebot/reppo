@@ -2,13 +2,15 @@
 
 {% block content %}
 
+{% if summary %}
 {% include '_summary.html' %}
+{% endif %}
 
 <div class="navigation">
     <span class="branch-select outline-button">
         <i class="fa fa-lg fa-code-fork"></i>
         <em>branch:</em>
-        <strong>{{ ref }}</strong>
+        <strong>{{ request.view_args.ref }}</strong>
         <i class="fa fa-caret-down"></i>
     </span>
     {% include '_breadcrumb.html' %}
@@ -18,16 +20,16 @@
 
 <div class="tree">
     <ul class="tree-entries">
-        {% if request.view_args.path is defined %}
+        {% if request.view_args.path %}
         <li class="tree-entry tree-entry-parent">
-            <a href="{{ url_for('.tree', ref=ref, path=request.view_args.path|parentpath) }}" rel="nofollow" title="Go to parent directory">
+            <a href="{{ url_for('.tree', path=request.view_args.path|parentpath) }}" rel="nofollow" title="Go to parent directory">
                 ..
             </a>
         </li>        
         {% endif %}
         {% for entry in tree %}
         <li class="tree-entry tree-entry-{{ entry.type }}">
-            <a href="{{ url_for('.' + entry.type, ref=ref, path=entry.path) }}">
+            <a href="{{ url_for('.' + entry.type, path=entry.path) }}">
                 {{ entry.name }}
             </a>
         </li>

@@ -6,7 +6,7 @@
 </a>
 {% endmacro %}
 <div class="summary">
-    {{ summary_block_item(url_for('.commits', ref=ref), 'history', 'commits') }}
+    {{ summary_block_item(url_for('.commits'), 'history', 'commits') }}
     {{ summary_block_item(url_for('.refs', ref_type='branches'), 'code-fork', 'branches') }}
     {{ summary_block_item(url_for('.refs', ref_type='tags'), 'tags', 'tags') }}
     {{ summary_block_item(url_for('.contributors'), 'users', 'contributors') }}

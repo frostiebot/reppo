@@ -8,8 +8,6 @@ from flask import Markup
 
 from flask import url_for
 
-from reppo.lib.util import is_sha
-
 NOW = datetime.now()
 
 JIRA_PROJECT_TICKET_RE = re.compile(r'''
@@ -25,6 +23,25 @@ JIRA_PROJECT_TICKET_RE = re.compile(r'''
     ''', re.IGNORECASE | re.VERBOSE)
 
 
+def is_sha(sha):
+    return isinstance(sha, basestring) and len(sha) == 40
+
+
+def normalizepath(path):
+    ''' expects some kind of iterable or sequence. Please be sensible.'''
+    return u'/'.join(*filter(None, path))
+
+
+def pathwalk(path):
+    path = path.strip(u'/').split(u'/')
+    for i in xrange(len(path)):
+        yield path[i], '/'.join(path[0:i + 1])
+
+
+def parentpath(path):
+    return u'/'.join(path.strip(u'/').split(u'/')[0:-1])
+
+
 def formatdate(dt, force_year=False):
     pattern = '%b %-d'
     if (dt.year != NOW.year) or force_year:
@@ -37,7 +54,7 @@ def isoformattimestamp(ts):
 
 
 def formatnumber(d):
-    return '{:,}'.format(d)
+    return u'{:,}'.format(d)
 
 
 def shortsha(sha, l=7):
@@ -61,7 +78,3 @@ def jiralink(message, sha=None, title=None):
         lambda m: m.expand(jira_link),
         message
     ))
-
-
-def parentpath(path):
-    return u'/'.join(path.strip(u'/').split(u'/')[:-1])

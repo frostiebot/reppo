@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/highlight.css') }}">
+{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="navigation">
+    <span class="branch-select outline-button">
+        <i class="fa fa-lg fa-code-fork"></i>
+        <em>branch:</em>
+        <strong>{{ request.view_args.ref }}</strong>
+        <i class="fa fa-caret-down"></i>
+    </span>
+    {% include '_breadcrumb.html' %}
+</div>
+
+{{ macros.commit_details(commit, preview=true) }}
+
+<div class="file">
+    <div class="meta">
+        <div class="info">
+            {{ line_count }} lines ({{ loc_count }} sloc) | {{ blob_data_size|filesizeformat }}
+        </div>
+        <div class="actions">
+            <a href="{{ url_for('.raw', path=request.view_args.path) }}" class="view-button">Raw</a>
+            <a href="{{ url_for('.commits', path=request.view_args.path) }}" class="view-button">History</a>
+        </div>
+    </div>
+    <div class="diff-wrapper">
+        {{ highlighted_data }}
+    </div>
+</div>
+{% endblock content %}

@@ -2,7 +2,7 @@
 
 import os
 
-from subprocess import check_output
+# from subprocess import check_output
 
 from collections import defaultdict
 from collections import Counter
@@ -10,170 +10,147 @@ from collections import OrderedDict
 
 from itertools import islice
 
-from dulwich.repo import Repo as DRepo
+from dulwich.repo import Repo
 
-from reppo.lib.util import commit_name_email
-from reppo.lib.util import get_commit_metadata
-from reppo.lib.util import get_commit_diff
+from reppo.lib.util import get_commit
+from reppo.lib.util import get_diff
+from reppo.lib.util import get_tree
+from reppo.lib.util import get_blob
 
-from reppo.lib.util import force_unicode
+from reppo.lib.util import _name_email
+
+# from reppo.lib.util import force_unicode
+
+# xs = 'lib/python/hotels/hotels/'.strip('/').split('/')
+# ['/'.join(xs[0:i + 1]) for i in xrange(len(xs))]
+# ['lib', 'lib/python', 'lib/python/hotels', 'lib/python/hotels/hotels']
+
+# for r in [key] + ['/'.join((prefix, key)) for prefix in (self.REFS_HEADS, self.REFS_TAGS)]:
+# for r in ('/'.join(filter(None, ref)) for ref in ((prefix, key) for prefix in (None, self.REFS_HEADS, self.REFS_TAGS))):
 
 
-class Repo(DRepo):
-    REFS_HEADS = 'refs/heads'
-    REFS_TAGS = 'refs/tags'
+def lazy(fn):
+    attr_name = '_'.join(('_lazy', fn.__name__))
 
     @property
-    def name(self):
-        return Repo.get_name(self.path)
+    def _lazy(self):
+        if not hasattr(self, attr_name):
+            setattr(self, attr_name, fn(self))
+        return getattr(self, attr_name)
 
-    @staticmethod
-    def get_name(path):
-        return path.replace('.git', '').rstrip(os.sep).split(os.sep)[-1]
+    return _lazy
 
-    def get_description(self):
-        description = super(Repo, self).get_description()
-        if description:
-            if not description.startswith('Unnamed repository;'):
-                return force_unicode(description)
+
+def name_repo(path):
+    return path.replace('.git', '').rstrip(os.sep).split(os.sep)[-1]
+
+
+class Reppo(object):
+    REFS_HEADS, REFS_TAGS = 'refs/heads', 'refs/tags'
+
+    def __init__(self, path, name=None):
+        self.repo = Repo(path)
+        self.name = name
+
+        if name is None:
+            self.name = name_repo(path)
+
+        self._refish = lambda r: ('/'.join(filter(None, ref)) for ref in ((prefix, str(r)) for prefix in (None, self.REFS_HEADS, self.REFS_TAGS)))
+
+    def __getitem__(self, key):
+        return next((self.repo[r] for r in self._refish(key) if r in self.repo), None)
+
+    def __contains__(self, item):
+        for r in self._refish(item):
+            if r in self.repo:
+                return True
+        return False
+
+    def _ref_walker(self, ref_type):
+        for ref in self.refs.iterkeys():
+            if ref.startswith(ref_type):
+                yield ref.replace(ref_type, '').lstrip('/')
+
+    @lazy
+    def refs(self):
+        return OrderedDict(
+            sorted(
+                self.repo.refs.as_dict().iteritems(),
+                key=lambda r: getattr(self.repo[r[1]], 'commit_time', None),
+                reverse=True
+            )
+        )
+
+    @lazy
+    def head(self):
+        return next(self.refs.itervalues(), None)
 
     @property
     def branches(self):
-        return self.get_refs(self.REFS_HEADS).iterkeys()
+        return self._ref_walker(self.REFS_HEADS)
 
     @property
     def tags(self):
-        return self.get_refs(self.REFS_TAGS).iterkeys()
+        return self._ref_walker(self.REFS_TAGS)
 
-    def _format_ref(self, *paths):
-        return '/'.join(filter(None, paths))
+    @lazy
+    def contributors(self):
+        # TODO: This is VERY expensive operation. Validate need (currently a glorified count)
+        contributors = defaultdict(int)
 
-    def _format_ref_branch(self, branch):
-        return self._format_ref(self.REFS_HEADS, branch)
+        for entry in self.repo.get_walker(include=[self.head], paths=[]):
+            name = _name_email(entry.commit.author)[0]
+            contributors[name] += 1
 
-    def _format_ref_tag(self, tag):
-        return self._format_ref(self.REFS_TAGS, tag)
+        return Counter(contributors).most_common()
 
-    def _get_commit_from_ref(self, ref):
-        return self[ref] if ref in self else None
-
-    def _get_commit_from_branch(self, branch):
-        ref = self._format_ref_branch(branch)
-        return self._get_commit_from_ref(ref)
-
-    def _get_commit_from_tag(self, tag):
-        ref = self._format_ref_tag(tag)
-        return self._get_commit_from_ref(ref)
-
-    def _get_commit(self, ref):
-        ref = str(ref)
-        for fn in (self._get_commit_from_ref, self._get_commit_from_branch, self._get_commit_from_tag):
-            commit = fn(ref)
-            if commit is not None:
-                break
-        return commit
-
-    def get_refs(self, prefix=None, sort='commit_time'):
-        # sort can also be 'author_time'
-        return OrderedDict(
-            sorted(
-                self.refs.as_dict(prefix).iteritems(),
-                key=lambda r: getattr(self[r[1]], sort, None),
-                reverse=True
-            )
-        )
-
-    def commit_walker(self, ref, path=None):
-        commit = self._get_commit(ref)
-        path = [path] if path else []
-        for entry in self.get_walker(include=commit.id, paths=path):
-            yield entry.commit
-
-    def history(self, ref, path=None, skip=0, stop=1):
-        for commit in islice(self.commit_walker(ref, path), skip, stop + skip):
-            yield get_commit_metadata(commit)
-
-    def latest(self, ref, path=None):
-        return next(self.history(ref, path, 0, 1), None)
-
-    def get_object(self, sha, path):
-        ''' Return either a proper `dulwich.objects.Blob` in the case
-            of viewing a file-like object, or a iterable list of pre-sorted
-            dicts that represent the directory structure of the commit
-            from the path specified
-
-            We play fast and loose with dulwich' types, knowing that a
-            type of 3 is a `dulwich.objects.Blob` (a file or file-like thing)
-            and 2 is a `dulwich.objects.Tree`, a container that could
-            hold yet more Tree and Blob objects.
-        '''
-        commit = self._get_commit(sha)
-        obj = self[commit.tree]
-
-        if path is not None:
-            for pth in path.strip('/').split('/'):
-                if obj.type == 3:  # 3 iz Blob!
-                    break
-                obj = self[obj[pth][1]]
-
-        if obj.type == 2:
-            return iter(
-                {
-                    'name': entry.path,
-                    'sha': entry.sha,
-                    'path': os.path.join(path, entry.path) if path else entry.path,
-                    'type': self[entry.sha].type_name
-                }
-                for entry in
-                sorted(obj.items(), key=lambda e: self[e.sha].type)
-            )
-
-        return obj
-
-    def summary_for_ref(self, ref):
+    def get_repo_summary(self):
+        # TODO: convert return dict to tuple?
+        # TODO: allow passing `ref` to reflect accurate commit count for the given ref
+        # TODO: count of commits needs to be made accurate for the current walker
         return dict(
-            commits=self.commit_count(ref),
+            commits=sum(c for a, c in self.contributors),
             branches=sum(1 for b in self.branches),
             tags=sum(1 for t in self.tags),
-            contributors=len(self.contributors())
+            contributors=len(self.contributors)
         )
 
-    def commit_count(self, ref):
-        return sum(1 for c in self.commit_walker(ref))
+    def get_tree(self, ref, path):
+        commit = self[ref]
+        return get_tree(self.repo, commit, path)
 
-    def commit_info(self, sha):
-        commit = self._get_commit(sha)
-        changes = get_commit_diff(self, commit)
+    def get_blob(self, ref, path):
+        commit = self[ref]
+        return get_blob(self.repo, commit, path)
 
-        summary = dict(
-            files=sum(1 for c in changes if not c.get('is_header')),
-            additions=sum(c.get('additions', 0) for c in changes),
-            deletions=sum(c.get('deletions', 0) for c in changes)
-        )
+    def get_commit(self, ref, path=None):
+        commit = self[ref]
 
-        return get_commit_metadata(commit), summary, changes
+        if path is None:
+            path = []
 
-    def contributors(self):
-        # sha = self.latest(self.branches.next(), None).id
-        # contributors = defaultdict(int)
-        # for commit in self.commit_walker(sha):
-        #     name, _ = commit_name_email(commit.author)
-        #     contributors[name] += 1
-        # return Counter(contributors).most_common()
+        if not isinstance(path, list):
+            path = [path]
 
-        cmd = ['git', 'shortlog', '-sn', self.branches.next()]
-        output = check_output(cmd, cwd=os.path.abspath(self.path))
-        return list(
-            c[1] for c in sorted(
-                (tuple(o.split('\t')) for o in output.strip().split('\n')),
-                key=lambda r: r[0],
-                reverse=True
-            )
-        )
+        def _get_commit():
+            for entry in self.repo.get_walker(include=[commit.id], paths=path, max_entries=1):
+                yield get_commit(entry.commit)
 
-    def branches_for_commit(self, sha):
-        #TODO: This can return too many branches in probably a lot of cases. Best to cut down the # of branches.
-        commit = self._get_commit(sha)
-        cmd = ['git', 'branch', '--contains', commit.id]
-        output = check_output(cmd, cwd=os.path.abspath(self.path))
-        return output.strip().split('\n')
+        return next(_get_commit(), None)
+
+    def get_diff(self, ref):
+        commit = self[ref]
+        return get_diff(self.repo, commit)
+
+    def get_history(self, ref, path=None, skip=0, stop=1):
+        # TODO: somehow prefer using max_entries param in get_walker rather than using islice
+        commit = self[ref]
+
+        if path is None:
+            path = []
+
+        if not isinstance(path, list):
+            path = [path]
+
+        for entry in islice(self.repo.get_walker(include=[commit.id], paths=path), skip, stop + skip):
+            yield get_commit(entry.commit)

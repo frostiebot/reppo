@@ -6,7 +6,6 @@ import locale
 
 from collections import namedtuple
 
-from datetime import datetime
 from datetime import date
 
 from textwrap import wrap
@@ -21,15 +20,14 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-# from dulwich.patch import write_object_diff
+from dulwich.object_store import tree_lookup_path
+
 from dulwich.patch import write_tree_diff
-# from dulwich.patch import is_binary
 
 from reppo.lib.diff import prepare_udiff
 
 ELL = u'…'
-SIGNED_OFF_BY_RE = re.compile(r'.*Signed-off-by:\s+(.*)\s+<(.*)>\n$')
-AUTHOR_NAME_EMAIL_RE = re.compile(r'^(.*)<(.*)>$')
+# SIGNED_OFF_BY_RE = re.compile(r'.*Signed-off-by:\s+(.*)\s+<(.*)>\n$')
 
 Contributor = namedtuple('Contributor', 'name email raw')
 Message = namedtuple('Message', 'summary description raw_summary raw_description')
@@ -47,51 +45,49 @@ class Commit(namedtuple('Commit', 'id parents author committer author_time commi
         return date.fromtimestamp(self.author_time)
 
 
-def is_sha(sha):
-    return isinstance(sha, basestring) and len(sha) == 40
+class Diff(namedtuple('Diff', 'changes')):
+    __slots__ = ()
+
+    @property
+    def files(self):
+        return sum(1 for c in self.changes if not c.get('is_header'))
+
+    def _counter(self, count_type):
+        return sum(c.get(count_type, 0) for c in self.changes)
+
+    @property
+    def additions(self):
+        return self._counter('additions')
+
+    @property
+    def deletions(self):
+        return self._counter('deletions')
 
 
-# def dict_diff(object_store, old, new):
-#     udiff = prepare_udiff(
-#         object_diff(object_store, old, new),
-#         want_header=False
-#     )
-#     return next(iter(udiff), None)
+class Tree(namedtuple('Tree', 'path sha type')):
+    __slots__ = ()
+
+    @property
+    def name(self):
+        return self.path.rsplit('/', 1)[-1]
 
 
-# def object_diff(*args, **kwargs):
-#     fd = StringIO()
-#     write_object_diff(fd, *args, **kwargs)
-#     return fd.getvalue()
+def _name_email(text):
+    (name, email) = text.rsplit(' <', 1)
+    return (name, email.rstrip('>'))
 
 
-# def changes_tree_diff(object_store, old_tree, new_tree):
-#     return object_store.tree_changes(old_tree, new_tree)
-
-
-def commit_name_email(commit_author, pattern=None):
-    if pattern is None:
-        pattern = AUTHOR_NAME_EMAIL_RE
-
-    try:
-        m = re.search(pattern, commit_author)
-        if m:
-            name, email = m.groups()
-    except:
-        name = commit_author
-        email = ''
-
-    return name.strip(), email.strip()
-
-
-def contributor_from_raw(raw_contributor, pattern=None):
-    name, email = commit_name_email(raw_contributor, pattern)
+def contributor_from_raw(raw_contributor):
+    name, email = _name_email(raw_contributor)
     return Contributor(name, email, raw_contributor)
 
 
 def message_from_raw(raw_message):
-    # !!! TODO: 'Signed-off-by: ...' can appear multiple times!
-    message = re.sub(SIGNED_OFF_BY_RE, u'', raw_message)
+    # TODO: 'Signed-off-by: ...' can appear multiple times!
+    # TODO: think harder about whether or not we want to simply remove signed-off-by or make it an attribute of the commit/author
+
+    # message = re.sub(SIGNED_OFF_BY_RE, u'', raw_message)
+    message = raw_message
 
     lines = iter(message.split(u'\n\n', 1))
     raw_summary = lines.next().rstrip()
@@ -111,10 +107,16 @@ def message_from_raw(raw_message):
     return Message(summary, description, raw_summary, raw_description)
 
 
-def get_commit_metadata(commit):
+def _object_lookup_path(repo, obj, path):
+    if path is not None:
+        obj = tree_lookup_path(repo.get_object, obj, path)[1]
+
+    return repo[obj]
+
+
+def get_commit(commit):
     author = contributor_from_raw(commit.author)
     committer = contributor_from_raw(commit.committer)
-    # signer = contributor_from_raw(commit.message, SIGNED_OFF_BY_RE)
     message = message_from_raw(commit.message)
 
     return Commit(
@@ -128,11 +130,14 @@ def get_commit_metadata(commit):
     )
 
 
-def get_commit_diff(repo, commit):
+def get_diff(repo, commit):
     fd = StringIO()
 
     oldtree = repo[commit.parents[0]].tree if commit.parents else None
     newtree = commit.tree
+
+    print oldtree
+    print newtree
 
     write_tree_diff(fd, repo.object_store, oldtree, newtree)
 
@@ -140,41 +145,27 @@ def get_commit_diff(repo, commit):
     # headers = list(h for h in udiff if h.get('is_header') is True)
     # print headers
 
-    return prepare_udiff(fd.getvalue(), want_header=True)
+    changes = prepare_udiff(fd.getvalue(), want_header=True)
+
+    return Diff(changes)
 
 
-# def get_commit_diff(repo, commit):
-#     oldtree = repo[commit.parents[0]].tree if commit.parents else None
-#     newtree = commit.tree
+def get_tree(repo, commit, path=None):
+    # TODO: verify isinstance(tree, dulwich.objects.Tree)
+    # TODO: Oh boy. Use get_walker for each TreeEntry to add the last commit + commit time
+    tree = _object_lookup_path(repo, commit.tree, path)
 
-#     object_store = repo.object_store
+    for entry in sorted(tree.iteritems(), key=lambda e: repo[e.sha].type):
+        yield Tree(
+            '/'.join(filter(None, [path, entry.path])),
+            entry.sha,
+            repo[entry.sha].type_name
+        )
 
-#     changes = []
 
-#     for (oldpath, newpath), (oldmode, newmode), (oldsha, newsha) in changes_tree_diff(object_store, oldtree, newtree):
-#         oldinfo = (oldpath, oldmode, oldsha)
-#         newinfo = (newpath, newmode, newsha)
-
-#         change = dict(
-#             diffs=None,
-#             old=dict(zip(('path', 'mode', 'sha'), oldinfo)),
-#             new=dict(zip(('path', 'mode', 'sha'), newinfo)),
-#             additions=0,
-#             deletions=0
-#         )
-
-#         if not any(sha and sha in repo and is_binary(repo[sha].data) for sha in (newsha, oldsha)):
-#             diff = dict_diff(object_store, oldinfo, newinfo)
-
-#             if diff is not None:
-#                 change['chunks'] = diff.get('chunks', [])
-#                 change['additions'] = diff.get('additions', 0)
-#                 change['deletions'] = diff.get('deletions', 0)
-
-#         # print change
-#         changes.append(change)
-
-#     return changes
+def get_blob(repo, commit, path):
+    # TODO: verify isinstance(blob, dulwich.object.Blob)
+    return _object_lookup_path(repo, commit.tree, path)
 
 
 def force_unicode(s):

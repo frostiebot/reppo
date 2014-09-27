@@ -28,7 +28,7 @@ def create_app(config=None, blueprints=None):
 
 def configure_app(app, config):
     app.config.from_object(config)
-    app.config.from_envvar('CROSS_UWSGI_APP_CONFIG', silent=True)
+    app.config.from_envvar('REPPO_UWSGI_APP_CONFIG', silent=True)
 
     # Ensure we know if a request is secure or not and also which domain
     # the request was for.
@@ -44,7 +44,7 @@ def configure_app(app, config):
         # function is an application factory - it's up to the caller
         # to actually call run on the returned app instance.
         from werkzeug.debug import DebuggedApplication
-        app.wsgi_app = DebuggedApplication(app.wsgi_app, True)
+        app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True, console_path='/console')
 
 
 def configure_blueprints(app, blueprints):
@@ -75,19 +75,19 @@ def configure_helpers(app):
     #     timeformat=format_time,
     #     timedeltaformat=format_timedelta,
     # )
-    from reppo.utils.filters import jiralink, formatnumber, shortsha, formatdate, isoformattimestamp, parentpath
+    from reppo.utils.filters import jiralink, normalizepath, pathwalk, formatnumber, shortsha, formatdate, isoformattimestamp, parentpath
 
-    for fn in [jiralink, formatnumber, shortsha, formatdate, isoformattimestamp, parentpath, ]:
+    for fn in [jiralink, normalizepath, pathwalk, formatnumber, shortsha, formatdate, isoformattimestamp, parentpath, ]:
         app.add_template_filter(fn)
 
 
 def configure_extensions(app):
     # -- Reppo Repo
 
-    from reppo.lib.repo import Repo
+    from reppo.lib.repo import name_repo
 
     app.config['REPOS'] = dict(
-        (Repo.get_name(repo_path), repo_path)
+        (name_repo(repo_path), repo_path)
         for repo_path in
         app.config.get('REPO_PATHS')
     )

@@ -5,8 +5,10 @@
 
 {% include '_commit_diff_summary.html' %}
 
+{#<pre>{{ changes }}</pre>#}
+
 <div class="files">
-    {% for change in changes if not change.is_header %}
+    {% for change in changes.changes if not change.is_header %}
     <div class="file">
         <div class="meta">
             <div class="info">
@@ -18,8 +20,8 @@
                         -{{ change.deletions }}
                     </span>
                 </span>
-                <span class="title" title="{{ change.new_filename or change.old_filename }}">
-                        {{ change.new_filename or change.old_filename }}
+                <span class="title" title="{{ change.new_filename }}">
+                        {{ change.new_filename }}
                 </span>
             </div>
             <div class="actions">
