@@ -110,7 +110,6 @@ def message_from_raw(raw_message):
 def _object_lookup_path(repo, obj, path):
     if path is not None:
         obj = tree_lookup_path(repo.get_object, obj, path)[1]
-
     return repo[obj]
 
 

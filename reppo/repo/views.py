@@ -37,6 +37,10 @@ bp = Blueprint('repo', __name__, url_prefix='/<repo_key>')
 
     TODO:
 
+    *   Switch to pygit2 (libgit2)
+
+    *   https://github.com/libgit2/libgit2sharp/issues/89
+
     *   Need branch selector for tree and commits views.
         (Branch selector on commits views can also show a sha as "current"
          branch, but the underlying selector still only allows refs)
@@ -71,15 +75,24 @@ def pull_repo_key(endpoint, values):
 
 @bp.before_request
 def get_repo_for_request():
-    repo_path = current_app.config['REPOS'].get(g.repo_key, None)
+    # repo_path = current_app.config['REPOS'].get(g.repo_key, None)
 
-    if repo_path is None:
+    # if repo_path is None:
+    #     return make_response(
+    #         'Repo with name "{}" not found.'.format(g.repo_key),
+    #         404
+    #     )
+
+    # g.repo = Reppo(repo_path)
+    repo = current_app.config['REPOS'].get(g.repo_key, None)
+
+    if repo is None:
         return make_response(
             'Repo with name "{}" not found.'.format(g.repo_key),
             404
         )
 
-    g.repo = Reppo(repo_path)
+    g.repo = repo
 
 
 @bp.url_defaults
@@ -154,11 +167,12 @@ def tree(ref, path=None):
 @bp.route('/commits/<ref>/<path:path>')
 def commits(ref, path=None):
     # TODO: add back count! (oops)
+    # TODO: count needs to reflect length of history for path!
     per_page = 30
     page = abs(request.args.get('page', 1, type=int))
     skip = (page * per_page) - per_page
 
-    count = 11007  # g.repo.commit_count(ref)
+    count = g.repo.commits
     pagination = Pagination(page, per_page, count)
 
     history = g.repo.get_history(ref, path=path, skip=skip, stop=per_page)

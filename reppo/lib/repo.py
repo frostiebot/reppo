@@ -104,12 +104,17 @@ class Reppo(object):
 
         return Counter(contributors).most_common()
 
+    @lazy
+    def commits(self):
+        # TODO: I dislike this.
+        return sum(1 for c in self.repo.get_walker(include=[self.head], paths=[]))
+
     def get_repo_summary(self):
         # TODO: convert return dict to tuple?
         # TODO: allow passing `ref` to reflect accurate commit count for the given ref
         # TODO: count of commits needs to be made accurate for the current walker
         return dict(
-            commits=sum(c for a, c in self.contributors),
+            commits=self.commits,
             branches=sum(1 for b in self.branches),
             tags=sum(1 for t in self.tags),
             contributors=len(self.contributors)

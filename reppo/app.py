@@ -85,9 +85,10 @@ def configure_extensions(app):
     # -- Reppo Repo
 
     from reppo.lib.repo import name_repo
+    from reppo.lib.repo import Reppo
 
     app.config['REPOS'] = dict(
-        (name_repo(repo_path), repo_path)
+        (name_repo(repo_path), Reppo(repo_path))
         for repo_path in
         app.config.get('REPO_PATHS')
     )
