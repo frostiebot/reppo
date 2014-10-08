@@ -1,3 +1,7 @@
+{% macro icon() %}
+<i class="fa fa-{{ varargs|join(' fa-') }}"></i>
+{% endmacro %}
+
 {% macro time_element(dt, tm) %}
 <time datetime="{{ dt }} {{ tm }}">on {{ dt|formatdate }}</time>
 {% endmacro %}
@@ -26,11 +30,11 @@
 {% macro commit_details(commit, branches=none, preview=true) %}
 <div class="commit commit-{{ 'preview' if preview else 'full' }}">
     {% if not preview %}
-    <a href="{{ url_for('.tree', ref=commit.id) }}" class="browse-button">Browse Code</a>
+    <a href="{{ url_for('.tree', rev=commit.id) }}" class="browse-button">Browse Code</a>
     {% endif %}
 
     <p class="commit-title">
-        {% if preview %}<a href="{{ url_for('.commit', sha=commit.id) }}">{% endif %}
+        {% if preview %}<a href="{{ url_for('.commit', rev=commit.id) }}">{% endif %}
             {{ commit.message.summary|jiralink(commit.id if preview else none) }}
         {% if preview %}</a>{% endif %}
 
@@ -43,7 +47,7 @@
 
     {% if commit.message.description %}
     {% if preview %}<input type="checkbox" class="hidden-text-control" id="{{ commit.id }}-check">{% endif %}
-    <div class="commit-description{{ ' hidden-text' if preview else '' }}">
+    <div class="commit-description{{ ' hidden-text' if preview }}">
         <pre>{{ commit.message.description|jiralink }}</pre>
     </div>
     {% endif %}
@@ -54,7 +58,7 @@
         <ul class="branches-list">
             {% for branch in branches|reverse %}
             <li class="branch">
-                <a href="{{ url_for('.tree', ref=branch|trim) }}">{{ branch|trim }}</a>                
+                <a href="{{ url_for('.tree', rev=branch|trim) }}">{{ branch|trim }}</a>                
             </li>
             {% endfor %}            
         </ul>
@@ -67,7 +71,7 @@
             <i class="fa fa-clipboard"></i>
         </button>
 
-        <a href="{{ url_for('.commit', sha=commit.id) }}" class="sha-block">
+        <a href="{{ url_for('.commit', rev=commit.id) }}" class="sha-block">
             latest commit
             <span class="sha">{{ commit.id|shortsha(10) }}</span>
         </a>
@@ -80,7 +84,7 @@
         <span class="sha-block">
             {{ commit.parents|count }}
             parent
-            <a href="{{ url_for('.commit', sha=commit.parents[0]) }}" class="sha">{{ commit.parents[0]|shortsha }}</a>
+            <a href="{{ url_for('.commit', rev=commit.parents[0]) }}" class="sha">{{ commit.parents[0]|shortsha }}</a>
         </span>
         {% endif %}
 

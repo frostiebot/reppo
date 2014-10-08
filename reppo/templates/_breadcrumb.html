@@ -1,18 +1,9 @@
 <div class="breadcrumb">
-    {#
-    <select class="branch-selector">
-        {% for branch in g.repo.branches %}
-        <option value="{{ branch }}"{{ ' selected' if branch == ref else '' }}>
-            {{ branch }}
-        </option>
-        {% endfor %}
-    </select>
-    #}
-    {% if request.endpoint == 'repo.commits' %}
+    {% if request.endpoint == 'repo.commits' and request.view_args.path %}
     History for
     {% endif %}
     <a class="repo-root" href="{{ url_for('.tree') }}">
-        {{ g.repo.name }}
+        {{ g.repo_key }}
     </a>
     {% if request.view_args.path %}
     {% for name, path in request.view_args.path|pathwalk %}

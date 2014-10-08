@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Reppo!</title>
+    <title>{% block title %}Reppo{% endblock title %}</title>
 
     <meta charset="utf-8">
     <meta http-equiv="cleartype" content="on">
@@ -25,15 +25,18 @@
             <i class="fa fa-cube"></i>
             {{ SITE_NAME }}
             <span class="separator">/</span>
-            <a href="{{ url_for('.tree_no_ref') }}">
-                {{ g.repo.name }}
+            <a href="{{ url_for('.tree_no_rev') }}">
+                {{ g.repo_key }}
             </a>
         </h1>
     </div>
 </header>
 
 <div class="container">
+    {% block pre_content %}{% endblock pre_content %}
+    {% block navigation %}{% endblock navigation %}
     {% block content %}{% endblock content %}
+    {% block post_content %}{% endblock post_content %}
 </div>
 
 <footer>

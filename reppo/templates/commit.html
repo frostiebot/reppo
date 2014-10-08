@@ -1,56 +1,53 @@
 {% extends 'base.html' %}
 
+{% block title %}{{ commit.message.summary }} · {{ g.rev|shortsha }} · {{ g.repo_key }}{% endblock title %}
+
 {% block content %}
 {{ macros.commit_details(commit, branches, preview=false) }}
 
 {% include '_commit_diff_summary.html' %}
 
-{#<pre>{{ changes }}</pre>#}
-
 <div class="files">
-    {% for change in changes.changes if not change.is_header %}
+    {% for patch in diff %}
     <div class="file">
         <div class="meta">
             <div class="info">
                 <span class="diff-stat">
                     <span class="additions">
-                        +{{ change.additions }}
+                        +{{ patch.additions }}
                     </span>
                     <span class="deletions">
-                        -{{ change.deletions }}
+                        -{{ patch.deletions }}
                     </span>
                 </span>
-                <span class="title" title="{{ change.new_filename }}">
-                        {{ change.new_filename }}
+                <span class="title" title="{{ patch.new_file_path }}">
+                        {{ patch.new_file_path }}
                 </span>
             </div>
             <div class="actions">
-                <a class="view-button" href="{{ url_for('.blob', ref=commit.id, path=change.new_filename or change.old_filename) }}">View</a>
+                <a class="view-button" href="{{ url_for('.blob', rev=commit.id, path=patch.new_file_path or patch.old_file_path) }}">View</a>
             </div>
         </div>
 
         <div class="diff-wrapper">
             <table class="diff-table">
                 <tbody>
-                    {% for chunk in change.chunks %}
-                    {% set chunkloop = loop %}
-                    {% for blob in chunk %}
+                    {% for hunk in patch.hunks %}
                     <tr>
-                        <td class="blob-num blob-num-{{ blob.action }}" id="diff-{{ chunkloop.index }}-{{ loop.index }}L{{ blob.old_lineno or '' }}" data-line-number="{{ blob.old_lineno }}">
-                            {#<a href="#diff-{{ chunkloop.index }}-{{ loop.index }}L{{ blob.old_lineno }}">{{ blob.old_lineno }}</a>#}
+                        <td class="blob-num blob-num-hunk" colspan="2">&nbsp;</td>
+                        <td class="blob-code blob-code-hunk">{{ hunk.context_line }}</td>
+                    </tr>
+                    {% for hunk_line in hunk.lines %}
+                    <tr>
+                        <td class="blob-num blob-num-{{ hunk_line.action }}" id="diff-{{ patch.old_id }}L{{ hunk_line.old_lineno or '' }}" data-line-number="{{ hunk_line.old_lineno or '' }}">
+                            {#<a href="#diff-{{ patch.old_id }}L{{ hunk_line.old_lineno }}">{{ hunk_line.old_lineno }}</a>#}
                         </td>
-                        <td class="blob-num blob-num-{{ blob.action }}" id="diff-{{ chunkloop.index }}-{{ loop.index }}R{{ blob.new_lineno or '' }}" data-line-number="{{ blob.new_lineno }}">
-                            {#<a href="#diff-{{ chunkloop.index }}-{{ loop.index }}R{{ blob.new_lineno }}">{{ blob.new_lineno }}</a>#}
+                        <td class="blob-num blob-num-{{ hunk_line.action }}" id="diff-{{ patch.new_id }}R{{ hunk_line.new_lineno or '' }}" data-line-number="{{ hunk_line.new_lineno or '' }}">
+                            {#<a href="#diff-{{ patch.new_id }}R{{ hunk_line.new_lineno }}">{{ hunk_line.new_lineno }}</a>#}
                         </td>
-                        <td class="blob-code blob-code-{{ blob.action }}">{{ blob.line|safe }}</td>
+                        <td class="blob-code blob-code-{{ hunk_line.action }}">{{ hunk_line.line }}</td>
                     </tr>
                     {% endfor %}
-                    {% if not loop.last %}
-                    <tr>
-                        <td class="blob-num blob-num-separator" colspan="2">&nbsp;</td>
-                        <td class="blob-code blob-code-separator"></td>
-                    </tr>
-                    {% endif %}
                     {% endfor %}
                 </tbody>
             </table>

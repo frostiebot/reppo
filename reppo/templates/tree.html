@@ -1,21 +1,16 @@
 {% extends 'base.html' %}
 
+{% block title %}{{ g.repo_key }}{% endblock title %}
+
+{% block pre_content %}
+{% include '_tree_summary.html' %}
+{% endblock pre_content %}
+
+{% block navigation %}
+{% include '_navigation.html' %}
+{% endblock navigation %}
+
 {% block content %}
-
-{% if summary %}
-{% include '_summary.html' %}
-{% endif %}
-
-<div class="navigation">
-    <span class="branch-select outline-button">
-        <i class="fa fa-lg fa-code-fork"></i>
-        <em>branch:</em>
-        <strong>{{ request.view_args.ref }}</strong>
-        <i class="fa fa-caret-down"></i>
-    </span>
-    {% include '_breadcrumb.html' %}
-</div>
-
 {{ macros.commit_details(latest, preview=true) }}
 
 <div class="tree">
@@ -30,8 +25,13 @@
         {% for entry in tree %}
         <li class="tree-entry tree-entry-{{ entry.type }}">
             <a href="{{ url_for('.' + entry.type, path=entry.path) }}">
-                {{ entry.name }}
+                {{ entry.name }}{#{{ entry.is_symlink }}#}
             </a>
+            {#
+            {{ entry.commit.message.summary }}
+            |
+            {{ entry.commit.commit_date|formatdate(true) }}
+            #}
         </li>
         {% endfor %}
     </ul>

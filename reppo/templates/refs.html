@@ -1,20 +1,18 @@
 {% extends 'base.html' %}
 
+{% block title %}{{ ref_type|capitalize }} · {{ g.repo_key }}{% endblock title %}
+
 {% block content %}
 <div class="refs">
-{% for r in refs %}
-    {% if loop.first %}
     <div class="ref default-ref">
         Default:
-        <a href="{{ url_for('.tree', ref=r) }}">{{ r }}</a>
+        <a href="{{ url_for('.tree') }}">{{ g.repo.head.shorthand }}</a>
     </div>
-
     <hr>
-    {% else %}
+{% for r in refs|sort %}
     <div class="ref">
-        <a href="{{ url_for('.tree', ref=r) }}">{{ r }}</a>
+        <a href="{{ url_for('.tree', rev=r) }}">{{ r }}</a>
     </div>
-    {% endif %}
 {% endfor %}
 </div>
 {% endblock content %}

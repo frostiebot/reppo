@@ -3,18 +3,18 @@
 from flask import Blueprint
 from flask import Response
 
+from flask import abort
 from flask import current_app
+from flask import flash
 from flask import g
+from flask import get_flashed_messages
 from flask import jsonify
-from flask import make_response
 from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
 
-from magic import from_buffer as magic_from_buffer
-
-from reppo.lib.repo import Reppo
+# from magic import from_buffer as magic_from_buffer
 
 from reppo.lib.highlight import pygmentize
 
@@ -22,88 +22,44 @@ from reppo.utils.pagination import Pagination
 
 bp = Blueprint('repo', __name__, url_prefix='/<repo_key>')
 
-'''
-    http://stackoverflow.com/questions/7782046/how-do-i-use-url-for-if-my-method-has-multiple-route-annotations/7876088#7876088
-
-    Flask Author appears to discourage the concept of stacking routes on a
-    single endpoint.
-
-    Instead, it is apparently "better" to make the "odd" routes return the
-    endpoint you wanted as a function call.
-
-    Meh.
-
-    ===============================================================================
-
-    TODO:
-
-    *   Switch to pygit2 (libgit2)
-
-    *   https://github.com/libgit2/libgit2sharp/issues/89
-
-    *   Need branch selector for tree and commits views.
-        (Branch selector on commits views can also show a sha as "current"
-         branch, but the underlying selector still only allows refs)
-
-    *   Refs view is unstyled and shit-tastic.
-
-    *   Derp. LDAP login protection.
-
-    *   http://stackoverflow.com/questions/2529441/how-to-work-with-diff-representation-in-git
-
-    *   /<repo_key>/blame/<ref>/<path:path> (ie. blame view of a blob). bleh.
-
-    Order of execution per-request is as follows:
-        1. url_value_preprocessor
-        2. before_request
-
-    Any functions decorated with the above will be executed in the
-    order they were defined here.
-
-    For example, if you have decorate two functions with
-    url_value_preprocessor, then those functions would be called in
-    the order they are physically defined in the code, but they would
-    still both be called *before* any before_request decorated functions
-    are called.
-'''
-
 
 @bp.url_value_preprocessor
 def pull_repo_key(endpoint, values):
-    g.repo_key = values.pop('repo_key')
+    g.repo_key = values.pop('repo_key', None)
+    g.rev = values.pop('rev', None)
 
 
 @bp.before_request
-def get_repo_for_request():
-    # repo_path = current_app.config['REPOS'].get(g.repo_key, None)
-
-    # if repo_path is None:
-    #     return make_response(
-    #         'Repo with name "{}" not found.'.format(g.repo_key),
-    #         404
-    #     )
-
-    # g.repo = Reppo(repo_path)
+def get_repo_and_commit_for_request():
     repo = current_app.config['REPOS'].get(g.repo_key, None)
 
     if repo is None:
-        return make_response(
-            'Repo with name "{}" not found.'.format(g.repo_key),
-            404
-        )
+        flash(u'Repo with name "{}" not found'.format(g.repo_key), u'reppo-404')
+        abort(404)
 
+    if g.rev is None:
+        g.rev = repo.head.shorthand
+
+    try:
+        commit = repo.git.revparse_single(g.rev)
+    except KeyError:
+        flash(u'Commit for rev "{}" in the "{}" repo not found'.format(g.rev, g.repo_key), u'repo-404')
+        abort(404)
+
+    g.commit = commit
     g.repo = repo
 
 
 @bp.url_defaults
 def add_repo_url_defaults(endpoint, values):
     values.setdefault('repo_key', g.repo_key)
+    # values.setdefault('rev', g.rev)
 
-    if 'ref' in values:
+    if 'rev' in values:
         return
 
-    if current_app.url_map.is_endpoint_expecting(endpoint, 'ref'):
-        values['ref'] = request.view_args.get('ref', g.repo.branches.next())
+    if current_app.url_map.is_endpoint_expecting(endpoint, 'rev'):
+        values['rev'] = g.rev
 
 
 @bp.context_processor
@@ -125,16 +81,20 @@ def inject_pagination_helper():
 
 @bp.errorhandler(404)
 def not_found(error):
-    return 'Nope', 404
+    repo_before_request_messages = get_flashed_messages(category_filter=[u'repo-404'])
+    message = u'Nope'
+    if repo_before_request_messages:
+        message = '\n'.join(repo_before_request_messages)
+    return message, 404
 
 
 @bp.route('/')
-def no_tree_no_ref():
+def no_tree_no_rev():
     return _redirect_to_tree()
 
 
 @bp.route('/tree/')
-def tree_no_ref():
+def tree_no_rev():
     return _redirect_to_tree()
 
 
@@ -142,119 +102,120 @@ def _redirect_to_tree():
     return redirect(url_for('.tree'))
 
 
-@bp.route('/tree/<ref>/')
-@bp.route('/tree/<ref>/<path:path>')
-def tree(ref, path=None):
-    # TODO: no trailing slash when no path?
-    # TODO: when ref is sha, don't display 'branch' in branch selector
+@bp.route('/tree/<rev>/')
+@bp.route('/tree/<rev>/<path:path>')
+def tree(path=None):
+    # TODO: We know if a Blob or Tree is actually a symlink - decorate appropriately in template
+    # TODO: format commit summary and commit date for per-object latest commit in template
+    # TODO: tree should probably be a table due to latest commit now available
+    # TODO: when path is not None show button to repo.commits at far right of breadcrumb
+    # TODO: lang summary - will require walking tree completely and dumping file extensions into a set (or a defaultdict that gets passed to a Counter)
     summary = None
 
     if path is None:
-        summary = g.repo.get_repo_summary()
+        summary = g.repo.stats(g.commit)
 
-    latest = g.repo.get_commit(ref, path)
-    tree = g.repo.get_tree(ref, path)
+    latest = g.repo.commit(g.commit, path)
+    tree = g.repo.tree(g.commit, path)
 
     return render_template(
         'tree.html',
-        summary=summary,
         latest=latest,
+        summary=summary,
         tree=tree,
     )
 
 
-@bp.route('/commits/<ref>')
-@bp.route('/commits/<ref>/<path:path>')
-def commits(ref, path=None):
-    # TODO: add back count! (oops)
-    # TODO: count needs to reflect length of history for path!
-    per_page = 30
+@bp.route('/commits/<rev>')
+@bp.route('/commits/<rev>/<path:path>')
+def commits(path=None):
+    # TODO: Make pagination cached in user session keyed by rev (pop last n revs)
     page = abs(request.args.get('page', 1, type=int))
+    per_page = 30
+
+    count = sum(1 for c in g.repo._walk(g.commit, path))
     skip = (page * per_page) - per_page
 
-    count = g.repo.commits
     pagination = Pagination(page, per_page, count)
 
-    history = g.repo.get_history(ref, path=path, skip=skip, stop=per_page)
+    log = g.repo.log(g.commit, path=path, skip=skip, stop=per_page)
 
     return render_template(
-        'history.html',
-        ref=ref,
-        history=history,
+        'commits.html',
+        log=log,
         pagination=pagination
     )
 
 
-@bp.route('/commit/<sha>')
-def commit(sha):
-    # TODO: check summary really is no longer used
+@bp.route('/commit/<rev>')
+def commit():
     # TODO: see if we can get branches for commit without explosions
-    # TODO: clean up 'changes' to 'diff'
-    # TODO: add chunk shas to diff for additional resolution of a diff overall
-    commit = g.repo.get_commit(sha)
-    changes = g.repo.get_diff(sha)
-    summary = {}
-    branches = None  # g.repo.branches_for_commit(sha)
+    # TODO: add hunk shas to diff for additional resolution of a diff overall (not possible with pygit2?)
+    commit = g.repo.commit(g.commit)
+    diff = g.repo.diff(g.commit)
+    branches = None  # g.repo.branches_for_commit(rev)
 
     return render_template(
         'commit.html',
         commit=commit,
-        summary=summary,
-        changes=changes,
+        diff=diff,
         branches=branches
     )
 
 
-@bp.route('/blob/<ref>/<path:path>')
-def blob(ref, path):
+@bp.route('/blob/<rev>/<path:path>')
+def blob(path):
     # TODO: clean all this crap up
     # TODO: actually do something if file is binary
     # TODO: is_binary + is_possibly_an_image -> display image?
     # TODO: limit display if file too big?
-    # TODO: use repo.get_walker to find contributors for entire history
+    # TODO: use repo.walk to find contributors for entire history
     # TODO: link to 'history' - see history route
-    # TODO: use max_entries=1 in repo.get_walker when we know we want just one commit?
-    commit = g.repo.get_commit(ref, path)
-    blob = g.repo.get_blob(ref, path)
+    commit = g.repo.commit(g.commit, path)
+    blob = g.repo.blob(g.commit, path)
+
+    # Nope. Don't know why.
+    # contributors = set()
+    # for c in g.repo._walk(g.commit, path):
+    #     contributors.add(c.author.name)
+    # current_app.logger.debug(contributors)
+    # current_app.logger.debug(len(contributors))
 
     line_count = blob.data.splitlines()
     loc_count = sum(1 for l in line_count if len(l.strip()) > 0)
 
-    # for line in line_count:
-    #     print repr(line)
-
-    textchars = ''.join(map(chr, [7, 8, 9, 10, 12, 13, 27] + range(0x20, 0x100)))
-    is_binary_string = lambda bytes: bool(bytes.translate(None, textchars))
-
-    blob_one_k = blob.data[:1024]
-
-    is_binary = is_binary_string(blob_one_k)
-    mimetype = magic_from_buffer(blob_one_k, mime=True)
+    blob.is_binary
+    # mimetype = magic_from_buffer(blob_one_k, mime=True)
 
     highlighted_data = pygmentize(blob.data, path.rsplit('/', 1)[-1])
 
-    # return '[BLOB] {repo} :: {ref} :: {blob}'.format(repo=g.repo.name, ref=ref, blob=blob)
     return render_template(
         'blob.html',
         commit=commit,
+        blob=blob,
         line_count=len(line_count),
         loc_count=loc_count,
-        blob_data_size=blob.raw_length(),
-        # blob_id=blob.id,
         highlighted_data=highlighted_data
     )
 
 
-@bp.route('/raw/<ref>/<path:path>')
-def raw(ref, path):
+@bp.route('/raw/<rev>/<path:path>')
+def raw(path):
     # TODO: limit raw display if file too big
-    blob = g.repo.get_blob(ref, path)
+    blob = g.repo.blob(g.commit, path)
 
     def generate():
-        for chunk in blob.chunked:
+        for chunk in blob.data:
             yield ''.join(chunk)
 
     return Response(generate(), mimetype='')
+
+
+@bp.route('/blame/<rev>/<path:path>')
+def blame(path):
+    # TODO: everything.
+    # blame = repo.blame(g.commit, path)
+    return 'Not here yet, thank you come again!'
 
 
 @bp.route('/<any(branches, tags):ref_type>')

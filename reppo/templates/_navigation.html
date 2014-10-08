@@ -1,0 +1,12 @@
+<div class="navigation">
+{% if request.endpoint == 'repo.commits' %}
+    {% if not request.view_args.path %}
+    {% include '_rev_selector.html' %}
+    {% else %}
+    {% include '_breadcrumb.html' %}
+    {% endif %}
+    {% else %}
+    {% include '_rev_selector.html' %}
+    {% include '_breadcrumb.html' %}
+{% endif %}
+</div>

@@ -22,6 +22,6 @@ BLUEPRINTS = (
 
 AVATAR_CACHE = os.path.join(PROJECT_ROOT, '.avatars')
 
-REPO_PATHS = (
-    '/home/chris/hosted/reppo/tablet.git',
+REPOS = (
+    ('tablet', '/home/chris/hosted/reppo/tablet.git'),
 )

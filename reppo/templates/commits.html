@@ -1,24 +1,15 @@
 {% extends 'base.html' %}
 {%- from 'macros.html' import render_pagination with context -%}
 
+{% block title %}Commits · {{ g.repo_key }}{% endblock title %}
+
+{% block navigation %}
+{% include '_navigation.html' %}
+{% endblock navigation %}
+
 {% block content %}
-
-<div class="navigation">
-    {% if not request.view_args.path %}
-    <span class="branch-select outline-button">
-        <i class="fa fa-lg fa-code-fork"></i>
-        <em>branch:</em>
-        <strong>{{ request.view_args.ref }}</strong>
-        <i class="fa fa-caret-down"></i>
-    </span>
-    {% else %}
-    {% include '_breadcrumb.html' %}
-    {% endif %}
-</div>
-
 <div class="history">
-    {#{% for day in history|groupby('author_date')|reverse %}#}
-    {% for day in history|groupby('commit_date')|reverse %}
+    {% for day in log|groupby('commit_date')|reverse %}
     <div class="history-entries-title">
         <i class="fa fa-dot-circle-o"></i>
         Commits on
@@ -29,10 +20,10 @@
         {#{% for entry in day.list|sort(attribute='author_time')|reverse %}#}
         {% for entry in day.list %}
         <li class="history-entry">
-            <a href="{{ url_for('.tree', ref=entry.id) }}" class="sha-block outline-button">
+            <a href="{{ url_for('.tree', rev=entry.id) }}" class="sha-block outline-button">
                 <i class="fa fa-code"></i>
             </a>
-            <a href="{{ url_for('.commit', sha=entry.id) }}" class="sha-block outline-button">
+            <a href="{{ url_for('.commit', rev=entry.id) }}" class="sha-block outline-button">
                 {{ entry.id|shortsha }}
             </a>
             <button class="js-zeroclipboard sha-block outline-button zeroclipboard-button" data-clipboard-text="{{ entry.id }}" data-copied-hint="Copied!" type="button" aria-label="Copy the full SHA">
@@ -42,7 +33,7 @@
             <img src="{{ url_for('avatar', name=entry.author.name) }}" class="avatar">
 
             <p class="history-title">
-                <a href="{{ url_for('.commit', sha=entry.id) }}" title="{{ entry.message.raw_summary }}">
+                <a href="{{ url_for('.commit', rev=entry.id) }}" title="{{ entry.message.raw_summary }}">
                     {{ entry.message.summary|jiralink(entry.id, entry.message.raw_summary) }}
                 </a>
 

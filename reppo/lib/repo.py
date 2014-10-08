@@ -1,32 +1,26 @@
 # -*- coding: utf-8 -*-
 
-import os
+import re
 
-# from subprocess import check_output
-
-from collections import defaultdict
 from collections import Counter
-from collections import OrderedDict
+from collections import defaultdict
 
 from itertools import islice
 
-from dulwich.repo import Repo
+from pygit2 import Repository
+
+from pygit2 import Blob
+from pygit2 import Tree
+
+from pygit2 import GIT_SORT_TOPOLOGICAL
+# from pygit2 import GIT_SORT_REVERSE
+# from pygit2 import GIT_SORT_TIME
+# from pygit2 import GIT_SORT_NONE
+
+from reppo.lib.diff import process_diff
 
 from reppo.lib.util import get_commit
-from reppo.lib.util import get_diff
-from reppo.lib.util import get_tree
-from reppo.lib.util import get_blob
-
-from reppo.lib.util import _name_email
-
-# from reppo.lib.util import force_unicode
-
-# xs = 'lib/python/hotels/hotels/'.strip('/').split('/')
-# ['/'.join(xs[0:i + 1]) for i in xrange(len(xs))]
-# ['lib', 'lib/python', 'lib/python/hotels', 'lib/python/hotels/hotels']
-
-# for r in [key] + ['/'.join((prefix, key)) for prefix in (self.REFS_HEADS, self.REFS_TAGS)]:
-# for r in ('/'.join(filter(None, ref)) for ref in ((prefix, key) for prefix in (None, self.REFS_HEADS, self.REFS_TAGS))):
+from reppo.lib.util import get_tree_entry
 
 
 def lazy(fn):
@@ -41,121 +35,127 @@ def lazy(fn):
     return _lazy
 
 
-def name_repo(path):
-    return path.replace('.git', '').rstrip(os.sep).split(os.sep)[-1]
+class Repo(object):
+    def __init__(self, path):
+        self.git = Repository(path)
 
-
-class Reppo(object):
-    REFS_HEADS, REFS_TAGS = 'refs/heads', 'refs/tags'
-
-    def __init__(self, path, name=None):
-        self.repo = Repo(path)
-        self.name = name
-
-        if name is None:
-            self.name = name_repo(path)
-
-        self._refish = lambda r: ('/'.join(filter(None, ref)) for ref in ((prefix, str(r)) for prefix in (None, self.REFS_HEADS, self.REFS_TAGS)))
-
-    def __getitem__(self, key):
-        return next((self.repo[r] for r in self._refish(key) if r in self.repo), None)
-
-    def __contains__(self, item):
-        for r in self._refish(item):
-            if r in self.repo:
-                return True
-        return False
-
-    def _ref_walker(self, ref_type):
-        for ref in self.refs.iterkeys():
-            if ref.startswith(ref_type):
-                yield ref.replace(ref_type, '').lstrip('/')
-
-    @lazy
-    def refs(self):
-        return OrderedDict(
-            sorted(
-                self.repo.refs.as_dict().iteritems(),
-                key=lambda r: getattr(self.repo[r[1]], 'commit_time', None),
-                reverse=True
-            )
-        )
-
-    @lazy
+    @property
     def head(self):
-        return next(self.refs.itervalues(), None)
+        return self.git.head
 
-    @property
+    @lazy
+    def latest(self):
+        return self.git.get(self.git.head.target)
+
+    @lazy
     def branches(self):
-        return self._ref_walker(self.REFS_HEADS)
+        return self.git.listall_branches()
 
-    @property
+    @lazy
     def tags(self):
-        return self._ref_walker(self.REFS_TAGS)
+        _re_tags = re.compile(r'^refs/tags/')
+        return filter(lambda r: _re_tags.match(r), self.git.listall_references())
 
     @lazy
     def contributors(self):
-        # TODO: This is VERY expensive operation. Validate need (currently a glorified count)
         contributors = defaultdict(int)
-
-        for entry in self.repo.get_walker(include=[self.head], paths=[]):
-            name = _name_email(entry.commit.author)[0]
-            contributors[name] += 1
-
+        for commit in self._walk(self.latest):
+            contributors[commit.author.name] += 1
         return Counter(contributors).most_common()
 
-    @lazy
-    def commits(self):
-        # TODO: I dislike this.
-        return sum(1 for c in self.repo.get_walker(include=[self.head], paths=[]))
+    def _object_from_path(self, commit, path):
+        if path is None:
+            return commit.tree
+        path = path.strip('/')
+        obj = None
+        if path in commit.tree:
+            obj = self.git.get(commit.tree[path].id, None)
+        return obj
 
-    def get_repo_summary(self):
-        # TODO: convert return dict to tuple?
-        # TODO: allow passing `ref` to reflect accurate commit count for the given ref
-        # TODO: count of commits needs to be made accurate for the current walker
+    def _object(self, commit, path, object_type):
+        obj = self._object_from_path(commit, path)
+        if not isinstance(obj, object_type):
+            return None
+        return obj
+
+    def _walk(self, commit=None, paths=None):
+        # TODO: Recreate situation that caused the WHAT IS THIS? comment
+        if commit is None:
+            commit = self.latest
+
+        if paths is not None:
+            if isinstance(paths, basestring):
+                paths = [paths]
+
+        for commit in self.git.walk(commit.id, GIT_SORT_TOPOLOGICAL):
+            if paths:
+                parent = next(iter(commit.parents), None)
+
+                for path in paths:
+                    a = self._object_from_path(commit, path)
+                    if parent is None:
+                        if a:
+                            break
+                    else:
+                        b = self._object_from_path(parent, path)
+                        # WHAT IS THIS?
+                        if not b:
+                            break
+                        if a.id != b.id:
+                            break
+                else:
+                    continue
+
+            yield commit
+
+    def stats(self, commit=None):
         return dict(
-            commits=self.commits,
-            branches=sum(1 for b in self.branches),
-            tags=sum(1 for t in self.tags),
+            commits=sum(1 for c in self._walk(commit or self.latest)),
+            branches=len(self.branches),
+            tags=len(self.tags),
             contributors=len(self.contributors)
         )
 
-    def get_tree(self, ref, path):
-        commit = self[ref]
-        return get_tree(self.repo, commit, path)
+    def log(self, commit=None, path=None, skip=0, stop=1):
+        for commit in islice(self._walk(commit, path), skip, skip + stop):
+            yield get_commit(commit)
 
-    def get_blob(self, ref, path):
-        commit = self[ref]
-        return get_blob(self.repo, commit, path)
+    def commit(self, commit=None, path=None):
+        return next(self.log(commit, path), None)
 
-    def get_commit(self, ref, path=None):
-        commit = self[ref]
+    def tree(self, commit=None, path=None):
+        tree = self._object(commit, path, Tree)
 
-        if path is None:
-            path = []
+        if tree is None:
+            yield None
 
-        if not isinstance(path, list):
-            path = [path]
+        for entry in sorted(tree, key=lambda e: self.git[e.id].type):
+            yield get_tree_entry(self, commit, entry, path)
 
-        def _get_commit():
-            for entry in self.repo.get_walker(include=[commit.id], paths=path, max_entries=1):
-                yield get_commit(entry.commit)
+    def blob(self, commit=None, path=None):
+        return self._object(commit, path, Blob)
 
-        return next(_get_commit(), None)
+    def diff(self, commit):
+        parent = next(iter(commit.parents), None)
 
-    def get_diff(self, ref):
-        commit = self[ref]
-        return get_diff(self.repo, commit)
+        new_tree = commit.tree
+        old_tree = parent.tree if parent else None
 
-    def get_history(self, ref, path=None, skip=0, stop=1):
-        # TODO: somehow prefer using max_entries param in get_walker rather than using islice
-        commit = self[ref]
+        if new_tree and old_tree:
+            diff = old_tree.diff_to_tree(new_tree)
+            # html = prepare_udiff(diff.patch, want_header=False)
 
-        if path is None:
-            path = []
+            # return list(patch for patch in diff), html
+            return process_diff(diff)
 
-        if not isinstance(path, list):
-            path = [path]
+        return None
 
-        for entry in islice(self.repo.get_walker(include=[commit.id], paths=path), skip, stop + skip):
-            yield get_commit(entry.commit)
+    def blame(self, commit, path):
+        # TODO: Don't fully know how to work with this yet...
+        # TODO: Need blob - match blob lines with BlameHunk lines, I guess
+        # >>> dir(blame_hunk)
+        # ['__class__', '__delattr__', '__dict__', '__doc__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_blame', '_from_c', '_hunk', 'boundary', 'final_commit_id', 'final_committer', 'final_start_line_number', 'lines_in_hunk', 'orig_commit_id', 'orig_committer', 'orig_path', 'orig_start_line_number']
+        blame = self.git.blame(path, newest_commit=commit.id)
+        # for blame_hunk in blame:
+        #     yield blame_hunk
+        return blame

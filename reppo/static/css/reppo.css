@@ -22,7 +22,7 @@ a:hover {
 
 header {
     border-bottom: 1px solid #eee;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
 }
 
 header h1 {
@@ -113,13 +113,13 @@ footer {
 
 /* branch select */
 
-.branch-select {
+.rev-select {
     color: #333;
     float: left;
     margin-right: 10px;
 }
 
-.branch-select.outline-button {
+.rev-select.outline-button {
     font-weight: normal;
     margin-left: 0;
     text-shadow: 0 1px 0 rgba(255,255,255,0.9);
@@ -139,7 +139,7 @@ footer {
     -webkit-appearance: none
 }
 
-.branch-select.outline-button:hover {
+.rev-select.outline-button:hover {
     text-decoration: none;
     background-color: #ddd;
     background-image: -moz-linear-gradient(#eee, #ddd);
@@ -149,14 +149,14 @@ footer {
     border-color: #ccc
 }
 
-.branch-select.outline-button:active {
+.rev-select.outline-button:active {
     background-color: #dcdcdc;
     background-image: none;
     border-color: #b5b5b5;
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
 }
 
-.branch-select em {
+.rev-select em {
     opacity: 0.6;
     font-style: normal;
 }
@@ -892,6 +892,14 @@ color: #d3d3d3;
     border-collapse: separate;
 }
 
+/*.diff-table tr:first-child td {
+    padding-top: 5px;
+}
+
+.diff-table tr:last-child td {
+    padding-bottom: 5px;
+}
+*/
 .blob-num {
     border: solid #e0e0e0;
     border-width: 0 1px 0 0;
@@ -918,6 +926,7 @@ color: #d3d3d3;
     color: #333;
     font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
     font-size: 12px;
+    line-height: 18px;
     padding: 0 10px;
     position: relative;
     vertical-align: top;
@@ -925,20 +934,24 @@ color: #d3d3d3;
     overflow: visible;
 }
 
-.blob-code-separator {
+.blob-code-hunk {
     background-color: #f8fafd;
+    color: rgba(0,0,0,0.3);
+    padding-bottom: 4px;
+    padding-top: 4px;
+    vertical-align: middle;
 }
 
 
 /* Line Number Blob Extensions */
 
-.blob-num-separator {
+.blob-num-hunk {
     background-color: #f0f5fa;
     border-color: #d5e4f2;
 }
 
 .blob-num + .blob-num,
-.blob-num-separator {
+.blob-num-hunk {
     box-shadow: inset -4px 0 6px -6px rgba(0,0,0,0.6)
 }
 
@@ -954,32 +967,32 @@ color: #d3d3d3;
 /* Code Blob Additions */
 
 .blob-num-addition {
-    background-color: #ceffce;
-    border-color: #b4e2b4;
+    background-color: #dbffdb; /*#ceffce;*/
+    border-color: #c1e9c1; /*#b4e2b4;*/
 }
 
 .blob-code-addition {
-    background-color: #dfd;
+    background-color: #eaffea; /*#dfd;*/
 }
 
 .blob-code-addition .x {
-    background-color: #77f177;
+    background-color: #a6f3a6; /*#77f177*/;
 }
 
 
 /* Code Blob Deletions */
 
 .blob-num-deletion {
-    background-color: #f7c8c8;
-    border-color: #e9aeae;    
+    background-color: #ffdddd; /*#f7c8c8;*/
+    border-color: #f1c0c0; /*#e9aeae;*/
 }
 
 .blob-code-deletion {
-    background-color: #fdd;
+    background-color: #ffecec; /*#fdd;*/
 }
 
 .blob-code-deletion .x {
-    background-color: #faa;
+    background-color: #f8cbcb; /*#faa;*/
 }
 
 

@@ -1,9 +1,33 @@
 <div class="commit-diff-summary">
     {#<div class="commit-diff-summary">#}
     <div>
-        Showing {{ changes.files }} changed files with
-        <strong>{{ changes.additions }} additions</strong>
+        Showing {{ diff|count }} changed files with
+        <strong>{{ diff|sum(attribute='additions') }} additions</strong>
         and
-        <strong>{{ changes.deletions }} deletions</strong>.
+        <strong>{{ diff|sum(attribute='deletions') }} deletions</strong>.
     </div>
+
+    {#
+    <ul>
+        {% for patch in summary %}
+        <li>
+            <span>{{ patch.status }}</span>
+            {{ patch.old_file_path or patch.new_file_path }}
+            <span>
+                +{{ patch.additions }}
+                -{{ patch.deletions }}
+            </span>
+            {% for hunk in patch.hunks %}
+            <p>
+                {{ hunk.new_lines }}
+                {{ hunk.old_lines }}
+                {{ hunk.new_start }}
+                {{ hunk.old_start }}
+            </p>
+            <pre>{{ hunk.lines }}</pre>
+            {% endfor %}
+        </li>
+        {% endfor %}
+    </ul>
+    #}
 </div>

@@ -75,23 +75,19 @@ def configure_helpers(app):
     #     timeformat=format_time,
     #     timedeltaformat=format_timedelta,
     # )
-    from reppo.utils.filters import jiralink, normalizepath, pathwalk, formatnumber, shortsha, formatdate, isoformattimestamp, parentpath
+    from reppo.utils.filters import issha, jiralink, normalizepath, pathwalk, formatnumber, shortsha, formatdate, isoformattimestamp, parentpath
 
-    for fn in [jiralink, normalizepath, pathwalk, formatnumber, shortsha, formatdate, isoformattimestamp, parentpath, ]:
+    for fn in [issha, jiralink, normalizepath, pathwalk, formatnumber, shortsha, formatdate, isoformattimestamp, parentpath, ]:
         app.add_template_filter(fn)
 
 
 def configure_extensions(app):
     # -- Reppo Repo
 
-    from reppo.lib.repo import name_repo
-    from reppo.lib.repo import Reppo
+    from reppo.lib.repo import Repo
 
-    app.config['REPOS'] = dict(
-        (name_repo(repo_path), Reppo(repo_path))
-        for repo_path in
-        app.config.get('REPO_PATHS')
-    )
+    repos = app.config['REPOS']
+    app.config['REPOS'] = dict((name, Repo(path)) for name, path in repos)
 
     from reppo.utils.avatar import init_avatars
 

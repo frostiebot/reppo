@@ -1,0 +1,7 @@
+{% from 'macros.html' import icon %}
+<span class="rev-select outline-button">
+    {{ icon('lg', 'code-fork') }}
+    <em>{{ 'tree' if g.rev|issha else 'branch' }}:</em>
+    <strong>{{ g.rev|shortsha(10) if g.rev|issha else g.rev }}</strong>
+    {{ icon('caret-down') }}
+</span>

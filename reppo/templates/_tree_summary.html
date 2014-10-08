@@ -1,13 +1,16 @@
-{%  macro summary_block_item(href, icon, label) %}
+{% from 'macros.html' import icon %}
+{%  macro summary_block_item(href, icn, label) %}
 <a href="{{ href }}">
-    <i class="fa fa-lg fa-{{ icon }}"></i>
+    {{ icon('lg', icn) }}
     <strong>{{ summary[label]|int|formatnumber }}</strong>
     {{ label }}
 </a>
 {% endmacro %}
+{% if summary %}
 <div class="summary">
     {{ summary_block_item(url_for('.commits'), 'history', 'commits') }}
     {{ summary_block_item(url_for('.refs', ref_type='branches'), 'code-fork', 'branches') }}
     {{ summary_block_item(url_for('.refs', ref_type='tags'), 'tags', 'tags') }}
     {{ summary_block_item(url_for('.contributors'), 'users', 'contributors') }}
 </div>
+{% endif %}
