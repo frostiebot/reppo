@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ g.repo_key }}{% endblock title %}
+{% block title %}{{ g.repo_name }}{% endblock title %}
 
 {% block pre_content %}
 {% include '_tree_summary.html' %}
@@ -24,9 +24,14 @@
         {% endif %}
         {% for entry in tree %}
         <li class="tree-entry tree-entry-{{ entry.type }}">
-            <a href="{{ url_for('.' + entry.type, path=entry.path) }}">
-                {{ entry.name }}{#{{ entry.is_symlink }}#}
-            </a>
+            <span class="fa-stack">
+                <i class="fa fa-git-{{ entry.type }} fa-stack-1x"></i>
+                {% if entry.is_symlink %}
+                <i class="fa fa-git-symlink fa-stack-1x"></i>
+                {% endif %}
+            </span>
+
+            <a href="{{ url_for('.' + entry.type, path=entry.target) }}">{{ entry.name }}</a>
             {#
             {{ entry.commit.message.summary }}
             |

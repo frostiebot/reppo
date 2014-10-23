@@ -17,10 +17,13 @@ from pygit2 import GIT_SORT_TOPOLOGICAL
 # from pygit2 import GIT_SORT_TIME
 # from pygit2 import GIT_SORT_NONE
 
-from reppo.lib.diff import process_diff
+# from pygit2 import GIT_DIFF_IGNORE_WHITESPACE_EOL
 
-from reppo.lib.util import get_commit
-from reppo.lib.util import get_tree_entry
+from reppo.lib.blob import get_blob
+from reppo.lib.diff import get_diff
+from reppo.lib.commit import get_commit
+from reppo.lib.tree import get_tree_entry
+from reppo.lib.stats import get_language_stats
 
 
 def lazy(fn):
@@ -56,98 +59,73 @@ class Repo(object):
         _re_tags = re.compile(r'^refs/tags/')
         return filter(lambda r: _re_tags.match(r), self.git.listall_references())
 
-    @lazy
-    def contributors(self):
-        contributors = defaultdict(int)
-        for commit in self._walk(self.latest):
-            contributors[commit.author.name] += 1
-        return Counter(contributors).most_common()
-
-    def _object_from_path(self, commit, path):
+    def _object(self, commit, path):
         if path is None:
             return commit.tree
         path = path.strip('/')
-        obj = None
         if path in commit.tree:
-            obj = self.git.get(commit.tree[path].id, None)
-        return obj
+            return self.git.get(commit.tree[path].id, None)
+        return None
 
-    def _object(self, commit, path, object_type):
-        obj = self._object_from_path(commit, path)
-        if not isinstance(obj, object_type):
-            return None
-        return obj
-
-    def _walk(self, commit=None, paths=None):
-        # TODO: Recreate situation that caused the WHAT IS THIS? comment
-        if commit is None:
-            commit = self.latest
-
-        if paths is not None:
-            if isinstance(paths, basestring):
-                paths = [paths]
-
+    def _walk(self, commit=None, path=None, count=None):
+        commit = commit or self.latest
         for commit in self.git.walk(commit.id, GIT_SORT_TOPOLOGICAL):
-            if paths:
+            if path is not None:
+                # stop because path is not in commit tree
+                if path not in commit.tree:
+                    break
                 parent = next(iter(commit.parents), None)
-
-                for path in paths:
-                    a = self._object_from_path(commit, path)
-                    if parent is None:
-                        if a:
-                            break
-                    else:
-                        b = self._object_from_path(parent, path)
-                        # WHAT IS THIS?
-                        if not b:
-                            break
-                        if a.id != b.id:
-                            break
-                else:
+                # stop because this is the first commit
+                if parent is None:
+                    break
+                # yield and stop because this is the first commit that contains path
+                if path not in parent.tree:
+                    yield commit
+                    break
+                # skip this iteration because path did not change
+                if commit.tree[path].id == parent.tree[path].id:
                     continue
-
             yield commit
+            if count is not None:
+                count -= 1
+                if count <= 0:
+                    break
 
-    def stats(self, commit=None):
-        return dict(
-            commits=sum(1 for c in self._walk(commit or self.latest)),
-            branches=len(self.branches),
-            tags=len(self.tags),
-            contributors=len(self.contributors)
-        )
+    def revparse(self, rev):
+        try:
+            commit = self.git.revparse_single(rev)
+        except KeyError:
+            commit = None
+        return commit
 
     def log(self, commit=None, path=None, skip=0, stop=1):
         for commit in islice(self._walk(commit, path), skip, skip + stop):
             yield get_commit(commit)
 
     def commit(self, commit=None, path=None):
-        return next(self.log(commit, path), None)
+        if path is not None:
+            commit = next(self._walk(commit, path, 1), None)
+        return get_commit(commit) if (commit is not None) else None
 
     def tree(self, commit=None, path=None):
-        tree = self._object(commit, path, Tree)
+        tree = self._object(commit, path)
+        if isinstance(tree, Tree):
+            for entry in sorted(tree, key=lambda e: self.git[e.id].type):
+                yield get_tree_entry(self, commit, entry, path)
 
-        if tree is None:
-            yield None
-
-        for entry in sorted(tree, key=lambda e: self.git[e.id].type):
-            yield get_tree_entry(self, commit, entry, path)
-
-    def blob(self, commit=None, path=None):
-        return self._object(commit, path, Blob)
+    def blob(self, commit, path):
+        blob = self._object(commit, path)
+        if isinstance(blob, Blob):
+            return get_blob(blob, path)
+        return None
 
     def diff(self, commit):
+        # TODO: ensure diff.find_similar behaves
         parent = next(iter(commit.parents), None)
-
-        new_tree = commit.tree
-        old_tree = parent.tree if parent else None
-
-        if new_tree and old_tree:
-            diff = old_tree.diff_to_tree(new_tree)
-            # html = prepare_udiff(diff.patch, want_header=False)
-
-            # return list(patch for patch in diff), html
-            return process_diff(diff)
-
+        if parent:
+            diff = parent.tree.diff_to_tree(commit.tree)
+            diff.find_similar()
+            return get_diff(diff)
         return None
 
     def blame(self, commit, path):
@@ -159,3 +137,29 @@ class Repo(object):
         # for blame_hunk in blame:
         #     yield blame_hunk
         return blame
+
+    def contributors(self, commit=None, path=None):
+        contributors = defaultdict(int)
+        for commit in self._walk(commit, path):
+            contributors[commit.author.name] += 1
+        return Counter(contributors).most_common()
+
+    def stats(self, commit=None):
+        contributors = set()
+        commits = 0
+
+        for commit in self._walk(commit):
+            contributors.add(commit.author.name)
+            commits += 1
+
+        return dict(
+            commits=commits,
+            branches=len(self.branches),
+            tags=len(self.tags),
+            contributors=len(contributors)
+        )
+
+    def lang_stats(self, commit=None):
+        if commit is None:
+            commit = self.latest
+        return get_language_stats(self, commit)

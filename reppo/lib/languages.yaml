@@ -1,0 +1,1233 @@
+ABAP:
+  color: null
+  extensions: [.abap]
+  type: programming
+AGS Script:
+  color: '#B9D9FF'
+  extensions: [.asc, .ash]
+  type: programming
+ANTLR:
+  color: '#9DC3FF'
+  extensions: [.g4]
+  type: programming
+APL:
+  color: '#8a0707'
+  extensions: [.apl]
+  type: programming
+ASP:
+  color: '#6a40fd'
+  extensions: [.asp, .asax, .ascx, .ashx, .asmx, .aspx, .axd]
+  type: programming
+ATS:
+  color: '#1ac620'
+  extensions: [.dats, .atxt, .hats, .sats]
+  type: programming
+ActionScript:
+  color: '#e3491a'
+  extensions: [.as]
+  type: programming
+Ada:
+  color: '#02f88c'
+  extensions: [.adb, .ads]
+  type: programming
+Agda:
+  color: '#467C91'
+  extensions: [.agda]
+  type: programming
+Alloy:
+  color: '#cc5c24'
+  extensions: [.als]
+  type: programming
+ApacheConf:
+  color: null
+  extensions: [.apacheconf]
+  type: markup
+Apex:
+  color: null
+  extensions: [.cls]
+  type: programming
+AppleScript:
+  color: null
+  extensions: [.applescript, .scpt]
+  type: programming
+Arc:
+  color: '#ca2afe'
+  extensions: [.arc]
+  type: programming
+Arduino:
+  color: '#bd79d1'
+  extensions: [.ino]
+  type: programming
+AsciiDoc:
+  color: null
+  extensions: [.asciidoc, .adoc, .asc]
+  type: prose
+AspectJ:
+  color: '#1957b0'
+  extensions: [.aj]
+  type: programming
+Assembly:
+  color: '#a67219'
+  extensions: [.asm, .a51]
+  type: programming
+Augeas:
+  color: null
+  extensions: [.aug]
+  type: programming
+AutoHotkey:
+  color: '#6594b9'
+  extensions: [.ahk]
+  type: programming
+AutoIt:
+  color: '#36699B'
+  extensions: [.au3]
+  type: programming
+Awk:
+  color: null
+  extensions: [.awk, .auk, .gawk, .mawk, .nawk]
+  type: programming
+Batchfile:
+  color: null
+  extensions: [.bat, .cmd]
+  type: programming
+Befunge:
+  color: null
+  extensions: [.befunge]
+  type: null
+BlitzBasic:
+  color: null
+  extensions: [.bb, .decls]
+  type: programming
+BlitzMax:
+  color: '#cd6400'
+  extensions: [.bmx]
+  type: programming
+Bluespec:
+  color: null
+  extensions: [.bsv]
+  type: programming
+Boo:
+  color: '#d4bec1'
+  extensions: [.boo]
+  type: programming
+Brainfuck:
+  color: null
+  extensions: [.b, .bf]
+  type: null
+Brightscript:
+  color: null
+  extensions: [.brs]
+  type: programming
+Bro:
+  color: null
+  extensions: [.bro]
+  type: programming
+C:
+  color: '#555'
+  extensions: [.c, .cats, .h, .w]
+  type: programming
+C#:
+  color: '#178600'
+  extensions: [.cs, .cshtml, .csx]
+  type: programming
+C++:
+  color: '#f34b7d'
+  extensions: [.cpp, .C, .c++, .cc, .cxx, .H, .h, .h++, .hh, .hpp, .hxx, .inl, .tcc,
+    .tpp, .ipp]
+  type: programming
+C-ObjDump:
+  color: null
+  extensions: [.c-objdump]
+  type: data
+C2hs Haskell:
+  color: null
+  extensions: [.chs]
+  type: programming
+CLIPS:
+  color: null
+  extensions: [.clp]
+  type: programming
+CMake:
+  color: null
+  extensions: [.cmake, .in]
+  type: null
+COBOL:
+  color: null
+  extensions: [.cob, .cbl, .ccp, .cobol, .cpy]
+  type: programming
+CSS:
+  color: '#563d7c'
+  extensions: [.css]
+  type: null
+Ceylon:
+  color: null
+  extensions: [.ceylon]
+  type: programming
+Chapel:
+  color: '#8dc63f'
+  extensions: [.chpl]
+  type: programming
+ChucK:
+  color: null
+  extensions: [.ck]
+  type: null
+Cirru:
+  color: '#aaaaff'
+  extensions: [.cirru]
+  type: programming
+Clean:
+  color: '#3a81ad'
+  extensions: [.icl, .dcl]
+  type: programming
+Clojure:
+  color: '#db5855'
+  extensions: [.clj, .cl2, .cljc, .cljs, .cljscm, .cljx, .hic, .hl]
+  type: programming
+CoffeeScript:
+  color: '#244776'
+  extensions: [.coffee, ._coffee, .cson, .iced]
+  type: programming
+ColdFusion:
+  color: '#ed2cd6'
+  extensions: [.cfm]
+  type: programming
+ColdFusion CFC:
+  color: '#ed2cd6'
+  extensions: [.cfc]
+  type: programming
+Common Lisp:
+  color: '#3fb68b'
+  extensions: [.lisp, .asd, .cl, .lsp, .ny, .podsl]
+  type: programming
+Component Pascal:
+  color: '#b0ce4e'
+  extensions: [.cp, .cps]
+  type: programming
+Coq:
+  color: null
+  extensions: [.coq, .v]
+  type: programming
+Cpp-ObjDump:
+  color: null
+  extensions: [.cppobjdump, .c++objdump, .cxx-objdump]
+  type: data
+Creole:
+  color: null
+  extensions: [.creole]
+  type: prose
+Crystal:
+  color: null
+  extensions: [.cr]
+  type: programming
+Cucumber:
+  color: null
+  extensions: [.feature]
+  type: null
+Cuda:
+  color: null
+  extensions: [.cu, .cuh]
+  type: programming
+Cycript:
+  color: null
+  extensions: [.cy]
+  type: programming
+Cython:
+  color: null
+  extensions: [.pyx, .pxd, .pxi]
+  type: programming
+D:
+  color: '#fcd46d'
+  extensions: [.d, .di]
+  type: programming
+D-ObjDump:
+  color: null
+  extensions: [.d-objdump]
+  type: data
+DM:
+  color: '#075ff1'
+  extensions: [.dm]
+  type: programming
+DOT:
+  color: null
+  extensions: [.dot, .gv]
+  type: data
+Darcs Patch:
+  color: null
+  extensions: [.darcspatch, .dpatch]
+  type: null
+Dart:
+  color: '#98BAD6'
+  extensions: [.dart]
+  type: programming
+Diff:
+  color: null
+  extensions: [.diff, .patch]
+  type: null
+Dogescript:
+  color: '#cca760'
+  extensions: [.djs]
+  type: programming
+Dylan:
+  color: '#3ebc27'
+  extensions: [.dylan, .intr, .lid]
+  type: programming
+E:
+  color: '#ccce35'
+  extensions: [.E]
+  type: programming
+ECL:
+  color: '#8a1267'
+  extensions: [.ecl, .eclxml]
+  type: programming
+Eagle:
+  color: '#3994bc'
+  extensions: [.sch, .brd]
+  type: markup
+Ecere Projects:
+  color: null
+  extensions: [.epj]
+  type: data
+Eiffel:
+  color: '#946d57'
+  extensions: [.e]
+  type: programming
+Elixir:
+  color: '#6e4a7e'
+  extensions: [.ex, .exs]
+  type: programming
+Elm:
+  color: null
+  extensions: [.elm]
+  type: programming
+Emacs Lisp:
+  color: '#c065db'
+  extensions: [.el, .emacs]
+  type: programming
+EmberScript:
+  color: '#f64e3e'
+  extensions: [.em, .emberscript]
+  type: programming
+Erlang:
+  color: '#0faf8d'
+  extensions: [.erl, .escript, .hrl]
+  type: programming
+F#:
+  color: '#b845fc'
+  extensions: [.fs, .fsi, .fsx]
+  type: programming
+FLUX:
+  color: '#33CCFF'
+  extensions: [.fx, .flux]
+  type: programming
+FORTRAN:
+  color: '#4d41b1'
+  extensions: [.f90, .F, .F03, .F08, .F77, .F90, .F95, .FOR, .FPP, .f, .f03, .f08,
+    .f77, .f95, .for, .fpp]
+  type: programming
+Factor:
+  color: '#636746'
+  extensions: [.factor]
+  type: programming
+Fancy:
+  color: '#7b9db4'
+  extensions: [.fy, .fancypack]
+  type: programming
+Fantom:
+  color: '#dbded5'
+  extensions: [.fan]
+  type: programming
+Forth:
+  color: '#341708'
+  extensions: [.fth, .4th, .forth, .frt]
+  type: programming
+Frege:
+  color: '#00cafe'
+  extensions: [.fr]
+  type: programming
+G-code:
+  color: null
+  extensions: [.g, .gco, .gcode]
+  type: data
+GAMS:
+  color: null
+  extensions: [.gms]
+  type: programming
+GAP:
+  color: null
+  extensions: [.g, .gap, .gd, .gi]
+  type: programming
+GAS:
+  color: null
+  extensions: [.s, .S]
+  type: programming
+GDScript:
+  color: null
+  extensions: [.gd]
+  type: programming
+GLSL:
+  color: null
+  extensions: [.glsl, .fp, .frag, .frg, .fshader, .geom, .glslv, .gshader, .shader,
+    .vert, .vrx, .vshader]
+  type: programming
+Game Maker Language:
+  color: '#8ad353'
+  extensions: [.gml]
+  type: programming
+Genshi:
+  color: null
+  extensions: [.kid]
+  type: null
+Gentoo Ebuild:
+  color: null
+  extensions: [.ebuild]
+  type: null
+Gentoo Eclass:
+  color: null
+  extensions: [.eclass]
+  type: null
+Gettext Catalog:
+  color: null
+  extensions: [.po, .pot]
+  type: null
+Glyph:
+  color: '#e4cc98'
+  extensions: [.glf]
+  type: programming
+Gnuplot:
+  color: '#f0a9f0'
+  extensions: [.gp, .gnu, .gnuplot, .plot, .plt]
+  type: programming
+Go:
+  color: '#375eab'
+  extensions: [.go]
+  type: programming
+Gosu:
+  color: '#82937f'
+  extensions: [.gs, .gst, .gsx, .vark]
+  type: programming
+Grace:
+  color: null
+  extensions: [.grace]
+  type: programming
+Grammatical Framework:
+  color: '#ff0000'
+  extensions: [.gf]
+  type: programming
+Graph Modeling Language:
+  color: null
+  extensions: [.gml]
+  type: data
+Groff:
+  color: null
+  extensions: [.man, '.1', '.2', '.3', '.4', '.5', '.6', '.7']
+  type: null
+Groovy:
+  color: '#e69f56'
+  extensions: [.groovy, .gradle, .grt, .gtpl, .gvy]
+  type: programming
+Groovy Server Pages:
+  color: null
+  extensions: [.gsp]
+  type: null
+HTML:
+  color: null
+  extensions: [.html, .htm, .st, .xhtml]
+  type: markup
+HTML+Django:
+  color: null
+  extensions: [.mustache, .jinja]
+  type: markup
+HTML+ERB:
+  color: null
+  extensions: [.erb, .deface]
+  type: markup
+HTML+PHP:
+  color: null
+  extensions: [.phtml]
+  type: markup
+HTTP:
+  color: null
+  extensions: [.http]
+  type: data
+Haml:
+  color: null
+  extensions: [.haml, .deface]
+  type: markup
+Handlebars:
+  color: null
+  extensions: [.handlebars, .hbs]
+  type: markup
+Harbour:
+  color: '#0e60e3'
+  extensions: [.hb]
+  type: programming
+Haskell:
+  color: '#29b544'
+  extensions: [.hs, .hsc]
+  type: programming
+Haxe:
+  color: '#f7941e'
+  extensions: [.hx, .hxsl]
+  type: programming
+Hy:
+  color: '#7891b1'
+  extensions: [.hy]
+  type: programming
+IDL:
+  color: '#e3592c'
+  extensions: [.pro, .dlm]
+  type: programming
+IGOR Pro:
+  color: null
+  extensions: [.ipf]
+  type: programming
+INI:
+  color: null
+  extensions: [.ini, .prefs, .properties]
+  type: data
+IRC log:
+  color: null
+  extensions: [.irclog, .weechatlog]
+  type: null
+Idris:
+  color: null
+  extensions: [.idr, .lidr]
+  type: programming
+Inform 7:
+  color: null
+  extensions: [.ni, .i7x]
+  type: programming
+Inno Setup:
+  color: null
+  extensions: [.iss]
+  type: null
+Io:
+  color: '#a9188d'
+  extensions: [.io]
+  type: programming
+Ioke:
+  color: '#078193'
+  extensions: [.ik]
+  type: programming
+Isabelle:
+  color: '#fdcd00'
+  extensions: [.thy]
+  type: programming
+J:
+  color: null
+  extensions: [.ijs]
+  type: programming
+JSON:
+  color: null
+  extensions: [.json, .lock, .sublime-keymap, .sublime-mousemap, .sublime-project,
+    .sublime-settings, .sublime-workspace, .sublime_metrics, .sublime_session]
+  type: data
+JSON5:
+  color: null
+  extensions: [.json5]
+  type: data
+JSONLD:
+  color: null
+  extensions: [.jsonld]
+  type: data
+JSONiq:
+  color: null
+  extensions: [.jq]
+  type: programming
+Jade:
+  color: null
+  extensions: [.jade]
+  type: markup
+Java:
+  color: '#b07219'
+  extensions: [.java]
+  type: programming
+Java Server Pages:
+  color: null
+  extensions: [.jsp]
+  type: null
+JavaScript:
+  color: '#f1e05a'
+  extensions: [.js, ._js, .bones, .es6, .frag, .jake, .jsb, .jsfl, .jsm, .jss, .jsx,
+    .njs, .pac, .sjs, .ssjs, .xsjs, .xsjslib]
+  type: programming
+Julia:
+  color: '#a270ba'
+  extensions: [.jl]
+  type: programming
+KRL:
+  color: '#f5c800'
+  extensions: [.krl]
+  type: programming
+Kit:
+  color: null
+  extensions: [.kit]
+  type: markup
+Kotlin:
+  color: null
+  extensions: [.kt, .ktm, .kts]
+  type: programming
+LFE:
+  color: '#004200'
+  extensions: [.lfe]
+  type: programming
+LLVM:
+  color: null
+  extensions: [.ll]
+  type: null
+LSL:
+  color: '#3d9970'
+  extensions: [.lsl]
+  type: programming
+LabVIEW:
+  color: null
+  extensions: [.lvproj]
+  type: programming
+Lasso:
+  color: '#2584c3'
+  extensions: [.lasso, .las, .lasso9, .ldml]
+  type: programming
+Latte:
+  color: '#A8FF97'
+  extensions: [.latte]
+  type: markup
+Less:
+  color: null
+  extensions: [.less]
+  type: markup
+LilyPond:
+  color: null
+  extensions: [.ly, .ily]
+  type: null
+Liquid:
+  color: null
+  extensions: [.liquid]
+  type: markup
+Literate Agda:
+  color: null
+  extensions: [.lagda]
+  type: programming
+Literate CoffeeScript:
+  color: null
+  extensions: [.litcoffee]
+  type: programming
+Literate Haskell:
+  color: null
+  extensions: [.lhs]
+  type: programming
+LiveScript:
+  color: '#499886'
+  extensions: [.ls, ._ls]
+  type: programming
+Logos:
+  color: null
+  extensions: [.xm]
+  type: programming
+Logtalk:
+  color: null
+  extensions: [.lgt, .logtalk]
+  type: programming
+LookML:
+  color: '#652B81'
+  extensions: [.lookml]
+  type: programming
+Lua:
+  color: '#fa1fa1'
+  extensions: [.lua, .fcgi, .nse, .pd_lua, .rbxs]
+  type: programming
+M:
+  color: null
+  extensions: [.mumps, .m]
+  type: programming
+MTML:
+  color: '#0095d9'
+  extensions: [.mtml]
+  type: markup
+Makefile:
+  color: null
+  extensions: [.mak, .mk]
+  type: null
+Mako:
+  color: null
+  extensions: [.mako, .mao]
+  type: null
+Markdown:
+  color: null
+  extensions: [.md, .markdown, .mkd, .mkdn, .mkdown, .ron]
+  type: prose
+Mask:
+  color: '#f97732'
+  extensions: [.mask]
+  type: markup
+Mathematica:
+  color: null
+  extensions: [.mathematica, .m, .nb]
+  type: programming
+Matlab:
+  color: '#bb92ac'
+  extensions: [.matlab, .m]
+  type: programming
+Max:
+  color: '#ce279c'
+  extensions: [.maxpat, .maxhelp, .maxproj, .mxt, .pat]
+  type: programming
+MediaWiki:
+  color: null
+  extensions: [.mediawiki]
+  type: prose
+Mercury:
+  color: '#abcdef'
+  extensions: [.m, .moo]
+  type: programming
+MiniD:
+  color: null
+  extensions: [.minid]
+  type: null
+Mirah:
+  color: '#c7a938'
+  extensions: [.druby, .duby, .mir, .mirah]
+  type: programming
+Monkey:
+  color: null
+  extensions: [.monkey]
+  type: programming
+Moocode:
+  color: null
+  extensions: [.moo]
+  type: programming
+MoonScript:
+  color: null
+  extensions: [.moon]
+  type: programming
+Myghty:
+  color: null
+  extensions: [.myt]
+  type: null
+NSIS:
+  color: null
+  extensions: [.nsi, .nsh]
+  type: null
+Nemerle:
+  color: '#0d3c6e'
+  extensions: [.n]
+  type: programming
+NetLogo:
+  color: '#ff2b2b'
+  extensions: [.nlogo]
+  type: programming
+Nginx:
+  color: null
+  extensions: [.nginxconf]
+  type: markup
+Nimrod:
+  color: '#37775b'
+  extensions: [.nim, .nimrod]
+  type: programming
+Nit:
+  color: '#0d8921'
+  extensions: [.nit]
+  type: programming
+Nix:
+  color: null
+  extensions: [.nix]
+  type: programming
+Nu:
+  color: '#c9df40'
+  extensions: [.nu]
+  type: programming
+NumPy:
+  color: null
+  extensions: [.numpy, .numpyw, .numsc]
+  type: null
+OCaml:
+  color: '#3be133'
+  extensions: [.ml, .eliom, .eliomi, .ml4, .mli, .mll, .mly]
+  type: programming
+ObjDump:
+  color: null
+  extensions: [.objdump]
+  type: data
+Objective-C:
+  color: '#438eff'
+  extensions: [.m, .h]
+  type: programming
+Objective-C++:
+  color: '#4886FC'
+  extensions: [.mm]
+  type: programming
+Objective-J:
+  color: '#ff0c5a'
+  extensions: [.j, .sj]
+  type: programming
+Omgrofl:
+  color: '#cabbff'
+  extensions: [.omgrofl]
+  type: programming
+Opa:
+  color: null
+  extensions: [.opa]
+  type: programming
+Opal:
+  color: '#f7ede0'
+  extensions: [.opal]
+  type: programming
+OpenCL:
+  color: null
+  extensions: [.cl, .opencl]
+  type: programming
+OpenEdge ABL:
+  color: null
+  extensions: [.p, .cls]
+  type: programming
+OpenSCAD:
+  color: null
+  extensions: [.scad]
+  type: programming
+Org:
+  color: null
+  extensions: [.org]
+  type: prose
+Ox:
+  color: null
+  extensions: [.ox, .oxh, .oxo]
+  type: programming
+Oxygene:
+  color: '#5a63a3'
+  extensions: [.oxygene]
+  type: programming
+PAWN:
+  color: '#dbb284'
+  extensions: [.pwn]
+  type: programming
+PHP:
+  color: '#4F5D95'
+  extensions: [.php, .aw, .ctp, .fcgi, .module, .php3, .php4, .php5, .phpt]
+  type: programming
+Pan:
+  color: '#cc0000'
+  extensions: [.pan]
+  type: programming
+Parrot:
+  color: '#f3ca0a'
+  extensions: [.parrot]
+  type: programming
+Parrot Assembly:
+  color: null
+  extensions: [.pasm]
+  type: programming
+Parrot Internal Representation:
+  color: null
+  extensions: [.pir]
+  type: programming
+Pascal:
+  color: '#b0ce4e'
+  extensions: [.pas, .dfm, .dpr, .lpr, .pp]
+  type: programming
+Perl:
+  color: '#0298c3'
+  extensions: [.pl, .PL, .cgi, .fcgi, .perl, .ph, .plx, .pm, .pod, .psgi, .t]
+  type: programming
+Perl6:
+  color: '#0298c3'
+  extensions: [.p6, .6pl, .6pm, .nqp, .p6l, .p6m, .pl6, .pm6]
+  type: programming
+PigLatin:
+  color: '#fcd7de'
+  extensions: [.pig]
+  type: programming
+Pike:
+  color: '#066ab2'
+  extensions: [.pike, .pmod]
+  type: programming
+Pod:
+  color: null
+  extensions: [.pod]
+  type: prose
+PogoScript:
+  color: '#d80074'
+  extensions: [.pogo]
+  type: programming
+PostScript:
+  color: null
+  extensions: [.ps, .eps]
+  type: markup
+PowerShell:
+  color: null
+  extensions: [.ps1, .psd1, .psm1]
+  type: programming
+Processing:
+  color: '#2779ab'
+  extensions: [.pde]
+  type: programming
+Prolog:
+  color: '#74283c'
+  extensions: [.pl, .ecl, .pro, .prolog]
+  type: programming
+Propeller Spin:
+  color: '#2b446d'
+  extensions: [.spin]
+  type: programming
+Protocol Buffer:
+  color: null
+  extensions: [.proto]
+  type: markup
+Puppet:
+  color: '#cc5555'
+  extensions: [.pp]
+  type: programming
+Pure Data:
+  color: '#91de79'
+  extensions: [.pd]
+  type: programming
+PureScript:
+  color: '#bcdc53'
+  extensions: [.purs]
+  type: programming
+Python:
+  color: '#3581ba'
+  extensions: [.py, .cgi, .fcgi, .gyp, .lmi, .pyde, .pyp, .pyt, .pyw, .wsgi, .xpy]
+  type: programming
+Python traceback:
+  color: null
+  extensions: [.pytb]
+  type: data
+QML:
+  color: '#44a51c'
+  extensions: [.qml]
+  type: markup
+QMake:
+  color: null
+  extensions: [.pro, .pri]
+  type: null
+R:
+  color: '#198ce7'
+  extensions: [.r, .R, .Rd, .rd, .rsx]
+  type: programming
+RDoc:
+  color: null
+  extensions: [.rdoc]
+  type: prose
+REALbasic:
+  color: null
+  extensions: [.rbbas, .rbfrm, .rbmnu, .rbres, .rbtbar, .rbuistate]
+  type: programming
+RHTML:
+  color: null
+  extensions: [.rhtml]
+  type: markup
+RMarkdown:
+  color: null
+  extensions: [.rmd, .Rmd]
+  type: prose
+Racket:
+  color: '#ae17ff'
+  extensions: [.rkt, .rktd, .rktl, .scrbl]
+  type: programming
+Ragel in Ruby Host:
+  color: '#ff9c2e'
+  extensions: [.rl]
+  type: programming
+Raw token data:
+  color: null
+  extensions: [.raw]
+  type: null
+Rebol:
+  color: '#358a5b'
+  extensions: [.reb, .r, .r2, .r3, .rebol]
+  type: programming
+Red:
+  color: '#ee0000'
+  extensions: [.red, .reds]
+  type: programming
+Redcode:
+  color: null
+  extensions: [.cw]
+  type: null
+RobotFramework:
+  color: null
+  extensions: [.robot]
+  type: programming
+Rouge:
+  color: '#cc0088'
+  extensions: [.rg]
+  type: programming
+Ruby:
+  color: '#701516'
+  extensions: [.rb, .builder, .fcgi, .gemspec, .god, .irbrc, .mspec, .pluginspec,
+    .podspec, .rabl, .rake, .rbuild, .rbw, .rbx, .ru, .thor, .watchr]
+  type: programming
+Rust:
+  color: '#dea584'
+  extensions: [.rs]
+  type: programming
+SAS:
+  color: '#1E90FF'
+  extensions: [.sas]
+  type: programming
+SCSS:
+  color: null
+  extensions: [.scss]
+  type: markup
+SQF:
+  color: '#FFCB1F'
+  extensions: [.sqf, .hqf]
+  type: programming
+SQL:
+  color: null
+  extensions: [.sql, .prc, .tab, .udf, .viw]
+  type: data
+STON:
+  color: null
+  extensions: [.ston]
+  type: data
+Sage:
+  color: null
+  extensions: [.sage]
+  type: programming
+Sass:
+  color: null
+  extensions: [.sass, .scss]
+  type: markup
+Scala:
+  color: '#7dd3b0'
+  extensions: [.scala, .sbt, .sc]
+  type: programming
+Scaml:
+  color: null
+  extensions: [.scaml]
+  type: markup
+Scheme:
+  color: '#1e4aec'
+  extensions: [.scm, .sld, .sls, .sps, .ss]
+  type: programming
+Scilab:
+  color: null
+  extensions: [.sci, .sce, .tst]
+  type: programming
+Self:
+  color: '#0579aa'
+  extensions: [.self]
+  type: programming
+Shell:
+  color: '#5861ce'
+  extensions: [.sh, .bash, .bats, .cgi, .fcgi, .tmux, .zsh]
+  type: programming
+ShellSession:
+  color: null
+  extensions: [.sh-session]
+  type: programming
+Shen:
+  color: '#120F14'
+  extensions: [.shen]
+  type: programming
+Slash:
+  color: '#007eff'
+  extensions: [.sl]
+  type: programming
+Slim:
+  color: '#ff8877'
+  extensions: [.slim]
+  type: markup
+Smalltalk:
+  color: '#596706'
+  extensions: [.st]
+  type: programming
+Smarty:
+  color: null
+  extensions: [.tpl]
+  type: null
+SourcePawn:
+  color: '#f69e1d'
+  extensions: [.sp]
+  type: programming
+Squirrel:
+  color: null
+  extensions: [.nut]
+  type: programming
+Standard ML:
+  color: '#dc566d'
+  extensions: [.ML, .fun, .sig, .sml]
+  type: programming
+Stata:
+  color: null
+  extensions: [.do, .ado, .doh, .ihlp, .mata, .matah, .sthlp]
+  type: programming
+Stylus:
+  color: null
+  extensions: [.styl]
+  type: markup
+SuperCollider:
+  color: '#46390b'
+  extensions: [.scd]
+  type: programming
+Swift:
+  color: '#ffac45'
+  extensions: [.swift]
+  type: programming
+SystemVerilog:
+  color: '#343761'
+  extensions: [.sv, .svh, .vh]
+  type: programming
+TOML:
+  color: null
+  extensions: [.toml]
+  type: data
+TXL:
+  color: null
+  extensions: [.txl]
+  type: programming
+Tcl:
+  color: '#e4cc98'
+  extensions: [.tcl, .adp, .tm]
+  type: programming
+Tcsh:
+  color: null
+  extensions: [.tcsh, .csh]
+  type: programming
+TeX:
+  color: '#3D6117'
+  extensions: [.tex, .aux, .bbx, .bib, .cbx, .cls, .dtx, .ins, .lbx, .ltx, .mkii,
+    .mkiv, .mkvi, .sty, .toc]
+  type: markup
+Tea:
+  color: null
+  extensions: [.tea]
+  type: markup
+Textile:
+  color: null
+  extensions: [.textile]
+  type: prose
+Turing:
+  color: '#45f715'
+  extensions: [.t, .tu]
+  type: programming
+Twig:
+  color: null
+  extensions: [.twig]
+  type: markup
+TypeScript:
+  color: '#31859c'
+  extensions: [.ts]
+  type: programming
+Unified Parallel C:
+  color: '#755223'
+  extensions: [.upc]
+  type: programming
+UnrealScript:
+  color: '#a54c4d'
+  extensions: [.uc]
+  type: programming
+VCL:
+  color: '#0298c3'
+  extensions: [.vcl]
+  type: programming
+VHDL:
+  color: '#543978'
+  extensions: [.vhdl, .vhd, .vhf, .vhi, .vho, .vhs, .vht, .vhw]
+  type: programming
+Vala:
+  color: '#ee7d06'
+  extensions: [.vala, .vapi]
+  type: programming
+Verilog:
+  color: '#848bf3'
+  extensions: [.v, .veo]
+  type: programming
+VimL:
+  color: '#199c4b'
+  extensions: [.vim]
+  type: programming
+Visual Basic:
+  color: '#945db7'
+  extensions: [.vb, .bas, .cls, .frm, .frx, .vba, .vbhtml, .vbs]
+  type: programming
+Volt:
+  color: '#0098db'
+  extensions: [.volt]
+  type: programming
+XC:
+  color: null
+  extensions: [.xc]
+  type: programming
+XML:
+  color: null
+  extensions: [.xml, .ant, .axml, .ccxml, .clixml, .cproject, .csproj, .ct, .dita,
+    .ditamap, .ditaval, .filters, .fsproj, .glade, .grxml, .ivy, .jelly, .kml, .launch,
+    .mxml, .nproj, .nuspec, .osm, .plist, .pluginspec, .ps1xml, .psc1, .pt, .rdf,
+    .rss, .scxml, .srdf, .svg, .targets, .tmCommand, .tmLanguage, .tmPreferences,
+    .tmSnippet, .tmTheme, .tml, .ui, .urdf, .vbproj, .vcxproj, .vxml, .wsdl, .wxi,
+    .wxl, .wxs, .x3d, .xacro, .xaml, .xlf, .xliff, .xmi, .xsd, .xul, .zcml]
+  type: markup
+XProc:
+  color: null
+  extensions: [.xpl, .xproc]
+  type: programming
+XQuery:
+  color: '#2700e2'
+  extensions: [.xquery, .xq, .xql, .xqm, .xqy]
+  type: programming
+XS:
+  color: null
+  extensions: [.xs]
+  type: null
+XSLT:
+  color: null
+  extensions: [.xslt, .xsl]
+  type: programming
+Xojo:
+  color: null
+  extensions: [.xojo_code, .xojo_menu, .xojo_report, .xojo_script, .xojo_toolbar,
+    .xojo_window]
+  type: programming
+Xtend:
+  color: null
+  extensions: [.xtend]
+  type: programming
+YAML:
+  color: null
+  extensions: [.yml, .reek, .rviz, .yaml]
+  type: data
+Zephir:
+  color: '#118f9e'
+  extensions: [.zep]
+  type: programming
+Zimpl:
+  color: null
+  extensions: [.zimpl, .zmpl, .zpl]
+  type: programming
+eC:
+  color: null
+  extensions: [.ec, .eh]
+  type: programming
+edn:
+  color: '#db5855'
+  extensions: [.edn]
+  type: data
+fish:
+  color: null
+  extensions: [.fish]
+  type: programming
+mupad:
+  color: null
+  extensions: [.mu]
+  type: null
+nesC:
+  color: '#ffce3b'
+  extensions: [.nc]
+  type: programming
+ooc:
+  color: '#b0b77e'
+  extensions: [.ooc]
+  type: programming
+reStructuredText:
+  color: null
+  extensions: [.rst, .rest]
+  type: prose
+wisp:
+  color: '#7582D1'
+  extensions: [.wisp]
+  type: programming
+xBase:
+  color: '#3a4040'
+  extensions: [.prg]
+  type: programming

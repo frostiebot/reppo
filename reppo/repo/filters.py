@@ -25,22 +25,24 @@ JIRA_PROJECT_TICKET_RE = re.compile(r'''
     ''', re.IGNORECASE | re.VERBOSE)
 
 
+def init_repo_template_filters(blueprint):
+    for fn in (issha, jiralink, pathwalk, formatnumber, shortsha, formatdate, parentpath):
+        blueprint.add_app_template_filter(fn)
+
+
 def issha(rev):
     return OID_RE.match(rev)
-
-
-def normalizepath(path):
-    ''' expects some kind of iterable or sequence. Please be sensible.'''
-    return u'/'.join(*filter(None, path))
 
 
 def pathwalk(path):
     path = path.strip(u'/').split(u'/')
     for i in xrange(len(path)):
-        yield path[i], '/'.join(path[0:i + 1])
+        yield path[i], u'/'.join(path[0:i + 1])
 
 
 def parentpath(path):
+    # works with single dir in path, but our paths always have no leading /
+    # return path.rstrip(u'/').rsplit(u'/', 1)[0].strip(u'/')
     return u'/'.join(path.strip(u'/').split(u'/')[0:-1])
 
 
@@ -49,10 +51,6 @@ def formatdate(dt, force_year=False):
     if (dt.year != NOW.year) or force_year:
         pattern += ', %Y'
     return dt.strftime(pattern)
-
-
-def isoformattimestamp(ts):
-    return datetime.fromtimestamp(ts).isoformat()
 
 
 def formatnumber(d):

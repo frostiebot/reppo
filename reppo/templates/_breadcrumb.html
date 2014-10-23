@@ -3,13 +3,14 @@
     History for
     {% endif %}
     <a class="repo-root" href="{{ url_for('.tree') }}">
-        {{ g.repo_key }}
+        {{ g.repo_name }}
     </a>
     {% if request.view_args.path %}
     {% for name, path in request.view_args.path|pathwalk %}
         <span class="separator">/</span>
         {% if not loop.last %}
-        <a href="{{ url_for(request.endpoint, path=path) }}">
+        {#<a href="{{ url_for(request.endpoint, path=path) }}">#}
+        <a href="{{ url_for('.tree', path=path) }}">
             {{ name }}
         </a>
         {% else %}

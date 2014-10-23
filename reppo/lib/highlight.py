@@ -32,11 +32,6 @@ BLOB_CODE_LINE = '''\
 
 
 class BlobFormatter(HtmlFormatter):
-    # def __init__(self):
-    #     super(BlobFormatter, self).__init__(
-    #         linenos=False
-    #     )
-
     def wrap(self, source, outfile):
         return self._wrap_code(source)
 
@@ -49,14 +44,8 @@ class BlobFormatter(HtmlFormatter):
             yield t, value
         yield 0, BLOB_CODE_TABLE_BODY_END
 
-    # def _format_lines(self, tokensource):
-    #     for ttype, value in super(BlobFormatter, self)._format_lines(tokensource):
-    #         if ttype == 1:
-    #             value = '<td class="blob-code">%s</td>' % value
-    #         yield ttype, value
 
-
-def pygmentize(data, filename=None):
+def highlight_blob(data, filename=None):
     try:
         lexer = get_lexer_for_filename(filename, data)
     except ClassNotFound:

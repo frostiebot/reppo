@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ commit.message.summary }} · {{ g.rev|shortsha }} · {{ g.repo_key }}{% endblock title %}
+{% block title %}{{ commit.message.summary }} · {{ g.rev|shortsha }} · {{ g.repo_name }}{% endblock title %}
 
 {% block content %}
 {{ macros.commit_details(commit, branches, preview=false) }}
@@ -9,9 +9,15 @@
 
 <div class="files">
     {% for patch in diff %}
-    <div class="file">
+    <a name="diff-{{ patch.new_id }}"></a>
+    <div id="diff-{{ loop.index0 }}" class="file">
         <div class="meta">
             <div class="info">
+                <span class="diffstat" aria-label="{{ patch.additions }} additions &amp; {{ patch.deletions }} deletions">
+                    {{ 'BIN' if patch.is_binary else patch.total_changes }}
+                    {{ macros.diffstat(patch.diffstat) }}
+                </span>
+                {#
                 <span class="diff-stat">
                     <span class="additions">
                         +{{ patch.additions }}
@@ -20,38 +26,59 @@
                         -{{ patch.deletions }}
                     </span>
                 </span>
-                <span class="title" title="{{ patch.new_file_path }}">
-                        {{ patch.new_file_path }}
+                #}
+                <span class="title" title="{{ patch.file_path }}">
+                        {#{{ patch.status }}#}
+                        {% if patch.was_renamed %}
+                        {{ patch.old_file_path }}
+                        {{ macros.icon('caret-right') }}
+                        {% endif %}
+                        {{ patch.file_path }}
                 </span>
             </div>
             <div class="actions">
-                <a class="view-button" href="{{ url_for('.blob', rev=commit.id, path=patch.new_file_path or patch.old_file_path) }}">View</a>
+                {% if commit.parents|count %}
+                <a class="mini-button" href="{{ url_for('.blob', rev=commit.id, path=patch.file_path) }}">
+                    View
+                </a>
+                {% endif %}
             </div>
         </div>
-
+        {% if patch.is_binary or patch.total_changes == 0 %}
+        <div class="empty">
+            {% if patch.is_binary %}
+            Binary file not shown
+            {% elif patch.total_changes == 0 %}
+            No changes
+            {% endif %}
+        </div>
+        {% else %}
         <div class="diff-wrapper">
             <table class="diff-table">
                 <tbody>
                     {% for hunk in patch.hunks %}
                     <tr>
                         <td class="blob-num blob-num-hunk" colspan="2">&nbsp;</td>
+                        {#<td class="blob-num blob-num-hunk">...</td>
+                        <td class="blob-num blob-num-hunk">...</td>#}
                         <td class="blob-code blob-code-hunk">{{ hunk.context_line }}</td>
                     </tr>
-                    {% for hunk_line in hunk.lines %}
+                    {% for line in hunk.lines %}
                     <tr>
-                        <td class="blob-num blob-num-{{ hunk_line.action }}" id="diff-{{ patch.old_id }}L{{ hunk_line.old_lineno or '' }}" data-line-number="{{ hunk_line.old_lineno or '' }}">
-                            {#<a href="#diff-{{ patch.old_id }}L{{ hunk_line.old_lineno }}">{{ hunk_line.old_lineno }}</a>#}
+                        <td class="blob-num blob-num-{{ line.action }}" id="diff-{{ patch.old_id }}L{{ line.old_lineno or '' }}" data-line-number="{{ line.old_lineno or '' }}">
+                            {#<a href="#diff-{{ patch.old_id }}L{{ line.old_lineno }}">{{ line.old_lineno }}</a>#}
                         </td>
-                        <td class="blob-num blob-num-{{ hunk_line.action }}" id="diff-{{ patch.new_id }}R{{ hunk_line.new_lineno or '' }}" data-line-number="{{ hunk_line.new_lineno or '' }}">
-                            {#<a href="#diff-{{ patch.new_id }}R{{ hunk_line.new_lineno }}">{{ hunk_line.new_lineno }}</a>#}
+                        <td class="blob-num blob-num-{{ line.action }}" id="diff-{{ patch.new_id }}R{{ line.new_lineno or '' }}" data-line-number="{{ line.new_lineno or '' }}">
+                            {#<a href="#diff-{{ patch.new_id }}R{{ line.new_lineno }}">{{ line.new_lineno }}</a>#}
                         </td>
-                        <td class="blob-code blob-code-{{ hunk_line.action }}">{{ hunk_line.line }}</td>
+                        <td class="blob-code blob-code-{{ line.action }}">{{ line.line }}</td>
                     </tr>
                     {% endfor %}
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+        {% endif %}
     </div>
     {% endfor %}
 </div>

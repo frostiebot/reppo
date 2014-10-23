@@ -14,60 +14,18 @@ from flask import render_template
 from flask import request
 from flask import url_for
 
-# from magic import from_buffer as magic_from_buffer
-
-from reppo.lib.highlight import pygmentize
-
 from reppo.utils.pagination import Pagination
 
-bp = Blueprint('repo', __name__, url_prefix='/<repo_key>')
+from reppo.repo.handlers import init_repo_handlers
+from reppo.repo.filters import init_repo_template_filters
 
+from reppo.repo.locals import current_repo
+from reppo.repo.locals import current_commit
 
-@bp.url_value_preprocessor
-def pull_repo_key(endpoint, values):
-    g.repo_key = values.pop('repo_key', None)
-    g.rev = values.pop('rev', None)
+bp = Blueprint('repo', __name__, url_prefix='/<repo_name>')
 
-
-@bp.before_request
-def get_repo_and_commit_for_request():
-    repo = current_app.config['REPOS'].get(g.repo_key, None)
-
-    if repo is None:
-        flash(u'Repo with name "{}" not found'.format(g.repo_key), u'reppo-404')
-        abort(404)
-
-    if g.rev is None:
-        g.rev = repo.head.shorthand
-
-    try:
-        commit = repo.git.revparse_single(g.rev)
-    except KeyError:
-        flash(u'Commit for rev "{}" in the "{}" repo not found'.format(g.rev, g.repo_key), u'repo-404')
-        abort(404)
-
-    g.commit = commit
-    g.repo = repo
-
-
-@bp.url_defaults
-def add_repo_url_defaults(endpoint, values):
-    values.setdefault('repo_key', g.repo_key)
-    # values.setdefault('rev', g.rev)
-
-    if 'rev' in values:
-        return
-
-    if current_app.url_map.is_endpoint_expecting(endpoint, 'rev'):
-        values['rev'] = g.rev
-
-
-@bp.context_processor
-def inject_repo_template_globals():
-    # TODO: Why does this even exist?
-    return dict(
-        SITE_NAME='reppo'
-    )
+init_repo_handlers(bp)
+init_repo_template_filters(bp)
 
 
 @bp.context_processor
@@ -81,7 +39,9 @@ def inject_pagination_helper():
 
 @bp.errorhandler(404)
 def not_found(error):
-    repo_before_request_messages = get_flashed_messages(category_filter=[u'repo-404'])
+    repo_before_request_messages = get_flashed_messages(
+        category_filter=[u'repo-404']
+    )
     message = u'Nope'
     if repo_before_request_messages:
         message = '\n'.join(repo_before_request_messages)
@@ -105,24 +65,22 @@ def _redirect_to_tree():
 @bp.route('/tree/<rev>/')
 @bp.route('/tree/<rev>/<path:path>')
 def tree(path=None):
-    # TODO: We know if a Blob or Tree is actually a symlink - decorate appropriately in template
     # TODO: format commit summary and commit date for per-object latest commit in template
     # TODO: tree should probably be a table due to latest commit now available
-    # TODO: when path is not None show button to repo.commits at far right of breadcrumb
+    # TODO: when path is not None show button to current_repo.commits at far right of breadcrumb
     # TODO: lang summary - will require walking tree completely and dumping file extensions into a set (or a defaultdict that gets passed to a Counter)
+    tree = current_repo.tree(current_commit, path)
+    latest = current_repo.commit(current_commit, path)
+
     summary = None
-
     if path is None:
-        summary = g.repo.stats(g.commit)
-
-    latest = g.repo.commit(g.commit, path)
-    tree = g.repo.tree(g.commit, path)
+        summary = current_repo.stats(current_commit)
 
     return render_template(
         'tree.html',
+        tree=tree,
         latest=latest,
         summary=summary,
-        tree=tree,
     )
 
 
@@ -130,15 +88,16 @@ def tree(path=None):
 @bp.route('/commits/<rev>/<path:path>')
 def commits(path=None):
     # TODO: Make pagination cached in user session keyed by rev (pop last n revs)
+    # TODO: Recreate instance where path did not appear to be working
     page = abs(request.args.get('page', 1, type=int))
     per_page = 30
 
-    count = sum(1 for c in g.repo._walk(g.commit, path))
+    count = sum(1 for c in current_repo._walk(current_commit, path))
     skip = (page * per_page) - per_page
 
     pagination = Pagination(page, per_page, count)
 
-    log = g.repo.log(g.commit, path=path, skip=skip, stop=per_page)
+    log = current_repo.log(current_commit, path=path, skip=skip, stop=per_page)
 
     return render_template(
         'commits.html',
@@ -150,62 +109,56 @@ def commits(path=None):
 @bp.route('/commit/<rev>')
 def commit():
     # TODO: see if we can get branches for commit without explosions
-    # TODO: add hunk shas to diff for additional resolution of a diff overall (not possible with pygit2?)
-    commit = g.repo.commit(g.commit)
-    diff = g.repo.diff(g.commit)
-    branches = None  # g.repo.branches_for_commit(rev)
+    diff = current_repo.diff(current_commit)
+    commit = current_repo.commit(current_commit)
+    branches = None  # current_repo.branches_for_commit(rev)
 
     return render_template(
         'commit.html',
-        commit=commit,
         diff=diff,
+        commit=commit,
         branches=branches
     )
 
 
 @bp.route('/blob/<rev>/<path:path>')
 def blob(path):
-    # TODO: clean all this crap up
-    # TODO: actually do something if file is binary
-    # TODO: is_binary + is_possibly_an_image -> display image?
     # TODO: limit display if file too big?
-    # TODO: use repo.walk to find contributors for entire history
-    # TODO: link to 'history' - see history route
-    commit = g.repo.commit(g.commit, path)
-    blob = g.repo.blob(g.commit, path)
+    # TODO: clean up compilation and rendering of contributors (perhaps move contributor into Blob?)
+    # TODO: handle 404 differently (add to repo.handlers - check endpoint)
+    blob = current_repo.blob(current_commit, path)
 
-    # Nope. Don't know why.
-    # contributors = set()
-    # for c in g.repo._walk(g.commit, path):
-    #     contributors.add(c.author.name)
-    # current_app.logger.debug(contributors)
-    # current_app.logger.debug(len(contributors))
+    if blob is None:
+        flash(u'Blob "{}" for rev "{}" in the "{}" repo not found'.format(path, g.rev, g.repo_name), u'repo-404')
+        abort(404)
 
-    line_count = blob.data.splitlines()
-    loc_count = sum(1 for l in line_count if len(l.strip()) > 0)
+    commit = current_repo.commit(current_commit, path)
 
-    blob.is_binary
-    # mimetype = magic_from_buffer(blob_one_k, mime=True)
-
-    highlighted_data = pygmentize(blob.data, path.rsplit('/', 1)[-1])
+    contributors = list(
+        contributor for contributor, count
+        in current_repo.contributors(current_commit, path)
+    )
 
     return render_template(
         'blob.html',
-        commit=commit,
         blob=blob,
-        line_count=len(line_count),
-        loc_count=loc_count,
-        highlighted_data=highlighted_data
+        commit=commit,
+        contributors=contributors
     )
 
 
 @bp.route('/raw/<rev>/<path:path>')
 def raw(path):
     # TODO: limit raw display if file too big
-    blob = g.repo.blob(g.commit, path)
+    # TODO: handle 404 differently (add to repo.handlers - check endpoint)
+    blob = current_repo.blob(current_commit, path)
+
+    if blob is None:
+        flash(u'Blob "{}" for rev "{}" in the "{}" repo not found'.format(path, g.rev, g.repo_name), u'repo-404')
+        abort(404)
 
     def generate():
-        for chunk in blob.data:
+        for chunk in blob.raw_data:
             yield ''.join(chunk)
 
     return Response(generate(), mimetype='')
@@ -214,14 +167,14 @@ def raw(path):
 @bp.route('/blame/<rev>/<path:path>')
 def blame(path):
     # TODO: everything.
-    # blame = repo.blame(g.commit, path)
+    # blame = current_repo.blame(current_commit, path)
     return 'Not here yet, thank you come again!'
 
 
 @bp.route('/<any(branches, tags):ref_type>')
 def refs(ref_type):
     # TODO: Probably cut this into distinct functions, since branches view is pretty detailed
-    refs = getattr(g.repo, ref_type, [])
+    refs = getattr(current_repo, ref_type, [])
 
     if request.is_xhr:
         return jsonify(**{ref_type: list(refs)})
@@ -235,5 +188,5 @@ def refs(ref_type):
 
 @bp.route('/contributors')
 def contributors():
-    contributors = g.repo.contributors
+    contributors = current_repo.contributors()
     return u'Excuse the mess, still working on this...\n\n' + unicode(contributors)

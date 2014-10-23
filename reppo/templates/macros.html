@@ -116,6 +116,18 @@
 </div>
 {% endmacro %}
 
+{%  macro diffstat(stat) %}
+<span class="diffstat-bar">
+    {%- for s in stat -%}
+    {%- if s != '' -%}
+    <i class="{{ s }}">&#xf04d;</i>
+    {%- else -%}
+    &#xf04d;
+    {%- endif -%}
+    {%- endfor -%}
+</span>
+{% endmacro %}
+
 {#
 {% macro render_pagination(pagination) %}
 <div class="pagination">

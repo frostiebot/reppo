@@ -1,33 +1,37 @@
 <div class="commit-diff-summary">
     {#<div class="commit-diff-summary">#}
     <div>
-        Showing {{ diff|count }} changed files with
+        {{ macros.icon('file-o') }}
+        Showing
+        <label for="commit-diff-summary-files-check">
+            {{ diff|count }}
+            changed files
+        </label>
+        with
         <strong>{{ diff|sum(attribute='additions') }} additions</strong>
         and
         <strong>{{ diff|sum(attribute='deletions') }} deletions</strong>.
     </div>
 
-    {#
-    <ul>
-        {% for patch in summary %}
+    <input type="checkbox" class="hidden-block-control" id="commit-diff-summary-files-check">
+    <ol class="hidden-block">
+        {% for patch in diff %}
         <li>
-            <span>{{ patch.status }}</span>
-            {{ patch.old_file_path or patch.new_file_path }}
-            <span>
-                +{{ patch.additions }}
-                -{{ patch.deletions }}
+            <span class="diffstat">
+                {% if patch.is_binary %}
+                BIN
+                {% else %}
+                    <span class="lines-added">+{{ patch.additions }}</span>
+                    <span class="lines-deleted">-{{ patch.deletions }}</span>
+                {% endif %}
+                <a href="#diff-{{ loop.index0 }}">
+                    {{ macros.diffstat(patch.diffstat) }}
+                </a>
             </span>
-            {% for hunk in patch.hunks %}
-            <p>
-                {{ hunk.new_lines }}
-                {{ hunk.old_lines }}
-                {{ hunk.new_start }}
-                {{ hunk.old_start }}
-            </p>
-            <pre>{{ hunk.lines }}</pre>
-            {% endfor %}
+            <span class="diff-status diff-status-{{ patch.status }}" title="{{ patch.status }}"></span>
+            <a href="#diff-{{ loop.index0 }}">{{ patch.file_path }}</a>
         </li>
         {% endfor %}
-    </ul>
-    #}
+    </ol>
+
 </div>

@@ -21,7 +21,6 @@ def create_app(config=None, blueprints=None):
     configure_app(app, config)
     configure_blueprints(app, blueprints or config.BLUEPRINTS)
     configure_extensions(app)
-    configure_helpers(app)
 
     return app
 
@@ -62,23 +61,12 @@ def configure_blueprints(app, blueprints):
         blueprint = import_string('{}:bp'.format(blueprint_name))
 
         if blueprint:
-            app.logger.debug('found blueprint at "{}" - registering with app...'.format(blueprint_name))
+            app.logger.debug(
+                'found blueprint at "{}" - registering with app...'.format(
+                    blueprint_name
+                )
+            )
             app.register_blueprint(blueprint, **blueprint_kwargs)
-
-
-def configure_helpers(app):
-    # !!! TODO: Turn this into a function inside reppo.helpers.__init__
-    # !!! TODO: to register filters/helpers easily/easier
-    # app.jinja_env.filters.update(
-    #     datetimeformat=format_datetime,
-    #     dateformat=format_date,
-    #     timeformat=format_time,
-    #     timedeltaformat=format_timedelta,
-    # )
-    from reppo.utils.filters import issha, jiralink, normalizepath, pathwalk, formatnumber, shortsha, formatdate, isoformattimestamp, parentpath
-
-    for fn in [issha, jiralink, normalizepath, pathwalk, formatnumber, shortsha, formatdate, isoformattimestamp, parentpath, ]:
-        app.add_template_filter(fn)
 
 
 def configure_extensions(app):
@@ -89,31 +77,8 @@ def configure_extensions(app):
     repos = app.config['REPOS']
     app.config['REPOS'] = dict((name, Repo(path)) for name, path in repos)
 
+    # -- Reppo Avatars
+
     from reppo.utils.avatar import init_avatars
 
     init_avatars(app)
-
-    # -- Flask-Login
-
-    # from hotels.models.customer import Customer
-    # from hotels.models.customer import Visitor
-
-    # from hotels.extensions import login_manager
-
-    #TODO: This needs investigation - Flask-Login seems to ignore the value from app config
-    # login_manager.session_protection = app.config.get('SESSION_PROTECTION', 'basic')
-
-    # login_manager.login_view = 'user.login'
-    # login_manager.refresh_view = 'user.refresh'
-
-    # login_manager.anonymous_user = Visitor
-
-    # @login_manager.user_loader
-    # def load_user(user_id):
-    #     customer, guest_profiles, billing_profiles = api_service.profiles(user_id)
-
-    #     if customer:
-    #         return Customer(user_id, customer)
-
-    #     return None
-    # login_manager.init_app(app)
