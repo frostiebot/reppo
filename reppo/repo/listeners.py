@@ -26,7 +26,7 @@ def log_request_response_data(app):
 
     @request_started.connect_via(app)
     def _log_request(sender, **extra):
-        if request.endpoint.startswith('repo.'):
+        if request.endpoint and request.endpoint.startswith('repo.'):
             g.__request_timer = (request.endpoint, timer())
 
     @request_finished.connect_via(app)

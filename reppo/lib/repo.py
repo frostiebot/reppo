@@ -94,7 +94,7 @@ class Repo(object):
     def revparse(self, rev):
         try:
             commit = self.git.revparse_single(rev)
-        except KeyError:
+        except (KeyError, TypeError):
             commit = None
         return commit
 

@@ -14,6 +14,9 @@ Meh.
 
 TODO:
 
+## PRIORITY (1)
+1. RepoProxy starting to get more complex than it's worth. Should not have wasted time with it.
+
 ## NOTE (1)
 1. lib/stats.py:63        If we want to revert back to grouping purely by extension
 

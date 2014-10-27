@@ -18,7 +18,8 @@ from flask import url_for
 
 from reppo.utils.pagination import Pagination
 
-from reppo.repo.locals import repo_proxy
+from reppo.repo.locals import current_repo
+from reppo.repo.locals import current_commit
 
 logger = logging.getLogger(__name__)
 bp = Blueprint('repo', __name__, url_prefix='/<repo_name>')
@@ -80,12 +81,12 @@ def tree(path=None):
     # TODO: tree should probably be a table due to latest commit now available
     # TODO: when path is not None show button to repo_current_proxy.commits at far right of breadcrumb
     # TODO: lang summary - will require walking tree completely and dumping file extensions into a set (or a defaultdict that gets passed to a Counter)
-    tree = repo_proxy.tree(path)
-    latest = repo_proxy.commit(path)
+    tree = current_repo.tree(current_commit, path)
+    latest = current_repo.commit(current_commit, path)
 
     summary = None
     if path is None:
-        summary = repo_proxy.stats()
+        summary = current_repo.stats(current_commit)
 
     return render_template(
         'tree.html',
@@ -103,13 +104,12 @@ def commits(path=None):
     page = abs(request.args.get('page', 1, type=int))
     per_page = 30
 
-    #count = sum(1 for c in repo_proxy._walk(current_commit, path))
-    count = repo_proxy.stats(path).get('commits', 0)
+    count = current_repo.stats(current_commit, path).get('commits', 0)
     skip = (page * per_page) - per_page
 
     pagination = Pagination(page, per_page, count)
 
-    log = repo_proxy.log(path=path, skip=skip, stop=per_page)
+    log = current_repo.log(current_commit, path=path, skip=skip, stop=per_page)
 
     return render_template(
         'commits.html',
@@ -121,9 +121,9 @@ def commits(path=None):
 @bp.route('/commit/<rev>')
 def commit():
     # TODO: see if we can get branches for commit without explosions
-    diff = repo_proxy.diff()
-    commit = repo_proxy.commit()
-    branches = None  # repo_proxy.branches_for_commit(rev)
+    diff = current_repo.diff(current_commit)
+    commit = current_repo.commit(current_commit)
+    branches = None  # current_repo.branches_for_commit(rev)
 
     return render_template(
         'commit.html',
@@ -138,20 +138,20 @@ def blob(path):
     # TODO: limit display if file too big?
     # TODO: clean up compilation and rendering of contributors (perhaps move contributor into Blob?)
     # TODO: handle 404 differently (add to repo.handlers - check endpoint)
-    blob = repo_proxy.blob(path)
+    blob = current_repo.blob(current_commit, path)
 
     if blob is None:
         flash(u'Blob "{}" for rev "{}" in the "{}" repo not found'.format(path, g.rev, g.repo_name), u'repo-404')
         abort(404)
 
-    commit = repo_proxy.commit(path)
+    commit = current_repo.commit(current_commit, path)
     # chances are that the current commit is a sha and also the correct sha.
     # nope. need to do some magic between knowing if ref (branch/tag) and sha (commit)
-    #commit = repo_proxy.commit()
+    # commit = current_repo.commit(current_commit)
 
     contributors = list(
         contributor for contributor, count
-        in repo_proxy.contributors(path)
+        in current_repo.contributors(current_commit, path)
     )
 
     return render_template(
@@ -166,7 +166,7 @@ def blob(path):
 def raw(path):
     # TODO: limit raw display if file too big
     # TODO: handle 404 differently (add to repo.handlers - check endpoint)
-    blob = repo_proxy.blob(path)
+    blob = current_repo.blob(current_commit, path)
 
     if blob is None:
         flash(u'Blob "{}" for rev "{}" in the "{}" repo not found'.format(path, g.rev, g.repo_name), u'repo-404')
@@ -182,14 +182,14 @@ def raw(path):
 @bp.route('/blame/<rev>/<path:path>')
 def blame(path):
     # TODO: everything.
-    # blame = repo_proxy.blame(path)
+    # blame = current_repo.blame(current_commit, path)
     return 'Not here yet, thank you come again!'
 
 
 @bp.route('/<any(branches, tags):ref_type>')
 def refs(ref_type):
     # TODO: Probably cut this into distinct functions, since branches view is pretty detailed
-    refs = getattr(repo_proxy, ref_type, [])
+    refs = getattr(current_repo, ref_type, [])
 
     if request.is_xhr:
         return jsonify(**{ref_type: list(refs)})
@@ -203,5 +203,5 @@ def refs(ref_type):
 
 @bp.route('/contributors')
 def contributors():
-    contributors = repo_proxy.contributors()
+    contributors = current_repo.contributors(current_commit)
     return u'Excuse the mess, still working on this...\n\n' + unicode(contributors)

@@ -5,13 +5,14 @@ from flask import current_app
 from flask import flash
 from flask import g
 
-from reppo.repo.locals import repo_proxy
+from reppo.repo.locals import current_repo
+from reppo.repo.locals import current_commit
 
 
 def init_repo_handlers(state):
     state.blueprint.url_value_preprocessor(_pull_repo_url_values)
     state.blueprint.url_defaults(_push_repo_url_values)
-    state.blueprint.before_request(_before_requst_check_repo_rev_commit)
+    state.blueprint.before_request(_before_request_check_repo_rev_commit)
 
 
 def _pull_repo_url_values(endpoint, values):
@@ -29,11 +30,14 @@ def _push_repo_url_values(endpoint, values):
         values['rev'] = g.rev
 
 
-def _before_requst_check_repo_rev_commit():
-    if not bool(repo_proxy):
+def _before_request_check_repo_rev_commit():
+    if not bool(current_repo):
         flash(u'Repo with name "{}" not found'.format(g.repo_name), u'repo-404')
         abort(404)
 
-    if not bool(repo_proxy._commit):
+    if g.rev is None:
+        g.rev = current_repo.head.shorthand
+
+    if not bool(current_commit):
         flash(u'Commit for rev "{}" in the "{}" repo not found'.format(g.rev, g.repo_name), u'repo-404')
         abort(404)
