@@ -1,0 +1,68 @@
+
+http://stackoverflow.com/questions/7782046/how-do-i-use-url-for-if-my-method-has-multiple-route-annotations/7876088#7876088
+
+Flask Author appears to discourage the concept of stacking routes on a
+single endpoint.
+
+Instead, it is apparently "better" to make the "odd" routes return the
+endpoint you wanted as a function call.
+
+Meh.
+
+================================================================================
+
+
+TODO:
+
+## NOTE (1)
+1. lib/stats.py:63        If we want to revert back to grouping purely by extension
+
+## TODO (28)
+1. repo/views.py:68       format commit summary and commit date for per-object latest commit in template
+2. repo/views.py:69       tree should probably be a table due to latest commit now available
+3. repo/views.py:70       when path is not None show button to current_repo.commits at far right of breadcrumb
+4. repo/views.py:71       lang summary - will require walking tree completely and dumping file extensions into a set (or a defaultdict that gets passed to a Counter)
+5. repo/views.py:90       Make pagination cached in user session keyed by rev (pop last n revs)
+6. repo/views.py:91       Recreate instance where path did not appear to be working
+7. repo/views.py:111      see if we can get branches for commit without explosions
+8. repo/views.py:126      limit display if file too big?
+9. repo/views.py:127      clean up compilation and rendering of contributors (perhaps move contributor into Blob?)
+10. repo/views.py:128     handle 404 differently (add to repo.handlers - check endpoint)
+11. repo/views.py:152     limit raw display if file too big
+12. repo/views.py:153     handle 404 differently (add to repo.handlers - check endpoint)
+13. repo/views.py:169     everything.
+14. repo/views.py:176     Probably cut this into distinct functions, since branches view is pretty detailed
+
+15. lib/repo.py:123       ensure diff.find_similar behaves
+16. lib/repo.py:132       Don't fully know how to work with this yet...
+17. lib/repo.py:133       Need blob - match blob lines with BlameHunk lines, I guess
+
+18. lib/diff.py:13        I don't think I really need this. (wish I could recall what I meant)
+19. lib/diff.py:122       Make this less naive/verbose
+20. lib/diff.py:186       make highlighting smarter - cover contiguous words rather than break
+21. lib/diff.py:234       Make Patch.diffstat into Patch.raw_diffstat and add a @property to emit the desired result
+
+22. lib/commit.py:29      'Signed-off-by: ...' can appear multiple times!
+23. lib/commit.py:30      think harder about whether or not we want to simply remove signed-off-by or make it an attribute of the commit/author
+
+24. lib/tree.py:44        if type is SYMLINK, we have to abspath (relatively, sigh) the target_ (ex. '../web_tabletcrs/crs', '/usr/tablet/web_tablethotels/pw')
+25. lib/tree.py:45        last commit that touched this entry
+
+26. lib/stats.py:20       No need to use groupby if using language_extensions
+27. lib/stats.py:21       When returning percentage, template needs a threshold percent to group items into 'Other' (max three items - ie. 'Python 50%, Javascript 45%, Other 5%')
+
+28. repo/converters.py:8  Abandon this for now... We will always need a string reference
+
+ACTIVE:
+
+*   /<repo_key>/blame/<rev>/<path:path> (ie. blame view of a blob). bleh.
+
+
+DONE:
+
+*   Switch to pygit2 (libgit2)
+
+*   https://github.com/libgit2/libgit2sharp/issues/89 (get last commit that affects <path>)
+
+
+================================================================================

@@ -6,12 +6,13 @@ from setuptools import setup
 Dependency Graph
 ----------------
 
-Flask-Script==0.6.7
-    Flask==0.10.1
-        itsdangerous==0.24
-        Werkzeug==0.9.6
-        Jinja2==2.7.3
-            MarkupSafe==0.23
+Flask==0.10.1
+    itsdangerous==0.24
+    Werkzeug==0.9.6
+    Jinja2==2.7.3
+        MarkupSafe==0.23
+
+blinker==1.3
 
 pygit2==0.21.3
     cffi==0.8.6
@@ -49,7 +50,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'Flask',            # 0.10.1
-        'Flask-Script',     # 0.6.7
+        'blinker',          # 1.3
         'pygit2',           # 0.21.3
         'retricon',         # 1.2.0
         'Pygments',         # 1.6

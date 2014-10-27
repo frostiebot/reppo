@@ -1,15 +1,9 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import os
 
-# from flask import url_for
-
-from flask.ext.script import Manager
-from flask.ext.script import Shell
-
-from flask.ext.script.commands import ShowUrls
-
-from reppo import create_app
+from werkzeug import script
 
 if 'LANG' not in os.environ:
     os.environ['LANG'] = 'en_US.UTF-8'
@@ -23,19 +17,22 @@ _BANNER = '''
           /_/   /_/
 '''
 
-manager = Manager(create_app, with_default_commands=False)
-manager.add_option('-c', '--config', dest='config')
+
+def make_app():
+    from reppo import create_app
+    return create_app()
 
 
-def _make_context():
-    return dict(
-        app=manager.app,
-    )
+def make_shell():
+    app = make_app()
+    repo = app.config['REPOS']['tablet']
+    return locals()
 
+action_runserver = script.make_runserver(make_app, use_reloader=True)
+action_shell = script.make_shell(make_shell, banner=_BANNER)
 
-manager.add_command('shell', Shell(banner=_BANNER, make_context=_make_context))
-manager.add_command('urls', ShowUrls())
-
+# example how to add our own actions
+# action_initdb = lambda: make_app().init_database()
 
 if __name__ == '__main__':
-    manager.run()
+    script.run()
