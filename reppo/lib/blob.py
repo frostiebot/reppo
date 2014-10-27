@@ -22,6 +22,7 @@ class Blob(namedtuple('Blob', 'data_ is_binary size path')):
 
     @property
     def loc_count(self):
+        # TODO: this is pretty bloody naive, but no useful lib exists to accurately calculate sloc
         if self.is_binary:
             return None
         return sum(1 for l in self.data_.splitlines() if len(l.strip()) > 0)

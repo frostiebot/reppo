@@ -25,9 +25,9 @@ JIRA_PROJECT_TICKET_RE = re.compile(r'''
     ''', re.IGNORECASE | re.VERBOSE)
 
 
-def init_repo_template_filters(blueprint):
+def init_repo_template_filters(state):
     for fn in (issha, jiralink, pathwalk, formatnumber, shortsha, formatdate, parentpath):
-        blueprint.add_app_template_filter(fn)
+        state.blueprint.add_app_template_filter(fn)
 
 
 def issha(rev):

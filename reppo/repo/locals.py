@@ -1,21 +1,26 @@
 # -*- coding: utf-8 -*-
 
+from flask import _app_ctx_stack
 from flask import current_app
 from flask import g
 
 from werkzeug.local import LocalProxy
 
-
-def _get_repo_from_name():
-    if '_current_repo' not in g:
-        g._current_repo = current_app.config['REPOS'].get(g.repo_name, None)
-    return g._current_repo
+from reppo.repo.extensions import RepoProxy
 
 
-def _get_commit_from_rev():
-    if '_current_commit' not in g:
-        g._current_commit = current_repo.revparse(g.rev)
-    return g._current_commit
+def _get_repo_proxy():
+    top = _app_ctx_stack.top
 
-current_repo = LocalProxy(_get_repo_from_name)
-current_commit = LocalProxy(_get_commit_from_rev)
+    if not hasattr(top, 'repo'):
+        repo_name = g.get('repo_name', None)
+        rev = g.get('rev', None)
+
+        if repo_name is not None:
+            repo = current_app.config['REPOS'].get(repo_name, None)
+            if repo is not None:
+                top.repo = RepoProxy(repo, rev)
+
+    return top.repo
+
+repo_proxy = LocalProxy(_get_repo_proxy)

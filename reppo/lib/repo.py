@@ -71,18 +71,18 @@ class Repo(object):
         commit = commit or self.latest
         for commit in self.git.walk(commit.id, GIT_SORT_TOPOLOGICAL):
             if path is not None:
-                # stop because path is not in commit tree
+                # stop because object is not in commit tree
                 if path not in commit.tree:
                     break
                 parent = next(iter(commit.parents), None)
                 # stop because this is the first commit
                 if parent is None:
                     break
-                # yield and stop because this is the first commit that contains path
+                # yield and stop because this is the first commit that contains object
                 if path not in parent.tree:
                     yield commit
                     break
-                # skip this iteration because path did not change
+                # skip this iteration because object had no changes
                 if commit.tree[path].id == parent.tree[path].id:
                     continue
             yield commit
@@ -120,7 +120,7 @@ class Repo(object):
         return None
 
     def diff(self, commit):
-        # TODO: ensure diff.find_similar behaves
+        # TODO: ensure diff.find_similar behaves (or make optional via querystring arg?)
         parent = next(iter(commit.parents), None)
         if parent:
             diff = parent.tree.diff_to_tree(commit.tree)
@@ -144,11 +144,12 @@ class Repo(object):
             contributors[commit.author.name] += 1
         return Counter(contributors).most_common()
 
-    def stats(self, commit=None):
+    def stats(self, commit=None, path=None):
+        # TODO: add kwargs to restrict return value for specific things
         contributors = set()
         commits = 0
 
-        for commit in self._walk(commit):
+        for commit in self._walk(commit, path):
             contributors.add(commit.author.name)
             commits += 1
 

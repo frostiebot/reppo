@@ -61,11 +61,7 @@ def configure_blueprints(app, blueprints):
         blueprint = import_string('{}:bp'.format(blueprint_name))
 
         if blueprint:
-            app.logger.debug(
-                'found blueprint at "{}" - registering with app...'.format(
-                    blueprint_name
-                )
-            )
+            app.logger.debug('registering blueprint "{}"'.format(blueprint.name))
             app.register_blueprint(blueprint, **blueprint_kwargs)
 
 
