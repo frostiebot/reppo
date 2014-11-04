@@ -6,7 +6,6 @@ from flask import Blueprint
 from flask import Response
 
 from flask import abort
-from flask import current_app
 from flask import flash
 from flask import g
 from flask import get_flashed_messages
@@ -18,8 +17,7 @@ from flask import url_for
 
 from reppo.utils.pagination import Pagination
 
-from reppo.repo.locals import current_repo
-from reppo.repo.locals import current_commit
+from .locals import repo
 
 logger = logging.getLogger(__name__)
 bp = Blueprint('repo', __name__, url_prefix='/<repo_name>')
@@ -29,9 +27,9 @@ bp = Blueprint('repo', __name__, url_prefix='/<repo_name>')
 def bp_registered_with_app(state):
     state.app.logger.debug('repo blueprint initializing...')
 
-    from reppo.repo.listeners import init_repo_listeners
-    from reppo.repo.handlers import init_repo_handlers
-    from reppo.repo.filters import init_repo_template_filters
+    from .listeners import init_repo_listeners
+    from .handlers import init_repo_handlers
+    from .filters import init_repo_template_filters
 
     init_repo_listeners(state)
     init_repo_handlers(state)
@@ -71,7 +69,7 @@ def tree_no_rev():
 
 
 def _redirect_to_tree():
-    return redirect(url_for('.tree'))
+    return redirect(url_for('.tree', rev=repo.head.shorthand))
 
 
 @bp.route('/tree/<rev>/')
@@ -79,14 +77,14 @@ def _redirect_to_tree():
 def tree(path=None):
     # TODO: format commit summary and commit date for per-object latest commit in template
     # TODO: tree should probably be a table due to latest commit now available
-    # TODO: when path is not None show button to repo_current_proxy.commits at far right of breadcrumb
+    # TODO: when path is not None show button to repo.commits at far right of breadcrumb
     # TODO: lang summary - will require walking tree completely and dumping file extensions into a set (or a defaultdict that gets passed to a Counter)
-    tree = current_repo.tree(current_commit, path)
-    latest = current_repo.commit(current_commit, path)
+    tree = repo.tree(path)
+    latest = repo.commit(path)
 
     summary = None
     if path is None:
-        summary = current_repo.stats(current_commit)
+        summary = repo.stats()
 
     return render_template(
         'tree.html',
@@ -104,12 +102,12 @@ def commits(path=None):
     page = abs(request.args.get('page', 1, type=int))
     per_page = 30
 
-    count = current_repo.stats(current_commit, path).get('commits', 0)
+    count = repo.stats(path).get('commits', 0)
     skip = (page * per_page) - per_page
 
     pagination = Pagination(page, per_page, count)
 
-    log = current_repo.log(current_commit, path=path, skip=skip, stop=per_page)
+    log = repo.log(path=path, skip=skip, stop=per_page)
 
     return render_template(
         'commits.html',
@@ -121,9 +119,9 @@ def commits(path=None):
 @bp.route('/commit/<rev>')
 def commit():
     # TODO: see if we can get branches for commit without explosions
-    diff = current_repo.diff(current_commit)
-    commit = current_repo.commit(current_commit)
-    branches = None  # current_repo.branches_for_commit(rev)
+    diff = repo.diff()
+    commit = repo.commit()
+    branches = None  # repo.branches_for_commit(rev)
 
     return render_template(
         'commit.html',
@@ -138,20 +136,17 @@ def blob(path):
     # TODO: limit display if file too big?
     # TODO: clean up compilation and rendering of contributors (perhaps move contributor into Blob?)
     # TODO: handle 404 differently (add to repo.handlers - check endpoint)
-    blob = current_repo.blob(current_commit, path)
+    blob = repo.blob(path)
 
     if blob is None:
         flash(u'Blob "{}" for rev "{}" in the "{}" repo not found'.format(path, g.rev, g.repo_name), u'repo-404')
         abort(404)
 
-    commit = current_repo.commit(current_commit, path)
-    # chances are that the current commit is a sha and also the correct sha.
-    # nope. need to do some magic between knowing if ref (branch/tag) and sha (commit)
-    # commit = current_repo.commit(current_commit)
+    commit = repo.commit(path)
 
     contributors = list(
         contributor for contributor, count
-        in current_repo.contributors(current_commit, path)
+        in repo.contributors(path)
     )
 
     return render_template(
@@ -166,7 +161,7 @@ def blob(path):
 def raw(path):
     # TODO: limit raw display if file too big
     # TODO: handle 404 differently (add to repo.handlers - check endpoint)
-    blob = current_repo.blob(current_commit, path)
+    blob = repo.blob(path)
 
     if blob is None:
         flash(u'Blob "{}" for rev "{}" in the "{}" repo not found'.format(path, g.rev, g.repo_name), u'repo-404')
@@ -182,14 +177,14 @@ def raw(path):
 @bp.route('/blame/<rev>/<path:path>')
 def blame(path):
     # TODO: everything.
-    # blame = current_repo.blame(current_commit, path)
+    # blame = repo.blame(path)
     return 'Not here yet, thank you come again!'
 
 
 @bp.route('/<any(branches, tags):ref_type>')
 def refs(ref_type):
     # TODO: Probably cut this into distinct functions, since branches view is pretty detailed
-    refs = getattr(current_repo, ref_type, [])
+    refs = getattr(repo, ref_type, [])
 
     if request.is_xhr:
         return jsonify(**{ref_type: list(refs)})
@@ -203,5 +198,5 @@ def refs(ref_type):
 
 @bp.route('/contributors')
 def contributors():
-    contributors = current_repo.contributors(current_commit)
+    contributors = repo.contributors()
     return u'Excuse the mess, still working on this...\n\n' + unicode(contributors)

@@ -4,7 +4,7 @@ import imghdr
 
 from collections import namedtuple
 
-from reppo.lib.highlight import highlight_blob
+from .highlight import highlight_blob
 
 
 class Blob(namedtuple('Blob', 'data_ is_binary size path')):

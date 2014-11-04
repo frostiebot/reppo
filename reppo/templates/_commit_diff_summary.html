@@ -4,13 +4,13 @@
         {{ macros.icon('file-o') }}
         Showing
         <label for="commit-diff-summary-files-check">
-            {{ diff|count }}
+            {{ diff|count|formatnumber }}
             changed files
         </label>
         with
-        <strong>{{ diff|sum(attribute='additions') }} additions</strong>
+        <strong>{{ diff|sum(attribute='additions')|formatnumber }} additions</strong>
         and
-        <strong>{{ diff|sum(attribute='deletions') }} deletions</strong>.
+        <strong>{{ diff|sum(attribute='deletions')|formatnumber }} deletions</strong>.
     </div>
 
     <input type="checkbox" class="hidden-block-control" id="commit-diff-summary-files-check">

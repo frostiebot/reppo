@@ -19,11 +19,11 @@ from pygit2 import GIT_SORT_TOPOLOGICAL
 
 # from pygit2 import GIT_DIFF_IGNORE_WHITESPACE_EOL
 
-from reppo.lib.blob import get_blob
-from reppo.lib.diff import get_diff
-from reppo.lib.commit import get_commit
-from reppo.lib.tree import get_tree_entry
-from reppo.lib.stats import get_language_stats
+from .blob import get_blob
+from .diff import get_diff
+from .commit import get_commit
+from .tree import get_tree_entry
+from .stats import get_language_stats
 
 
 def lazy(fn):
@@ -69,23 +69,21 @@ class Repo(object):
 
     def _walk(self, commit=None, path=None, count=None):
         commit = commit or self.latest
-        for commit in self.git.walk(commit.id, GIT_SORT_TOPOLOGICAL):
+        for c in self.git.walk(commit.id, GIT_SORT_TOPOLOGICAL):
             if path is not None:
                 # stop because object is not in commit tree
-                if path not in commit.tree:
+                if path not in c.tree:
                     break
-                parent = next(iter(commit.parents), None)
-                # stop because this is the first commit
-                if parent is None:
-                    break
+                parent = next(iter(c.parents), None)
                 # yield and stop because this is the first commit that contains object
-                if path not in parent.tree:
-                    yield commit
+                # or this is the initial commit, so the object has always been here
+                if parent is None or path not in parent.tree:
+                    yield c
                     break
                 # skip this iteration because object had no changes
-                if commit.tree[path].id == parent.tree[path].id:
+                if c.tree[path].id == parent.tree[path].id:
                     continue
-            yield commit
+            yield c
             if count is not None:
                 count -= 1
                 if count <= 0:
@@ -125,8 +123,10 @@ class Repo(object):
         if parent:
             diff = parent.tree.diff_to_tree(commit.tree)
             diff.find_similar()
-            return get_diff(diff)
-        return None
+        else:
+            # If no parent, this must be an initial commit, and diff_to_tree does not accept None for its tree argument
+            diff = commit.tree.diff_to_tree(swap=True)
+        return get_diff(diff)
 
     def blame(self, commit, path):
         # TODO: Don't fully know how to work with this yet...

@@ -84,7 +84,9 @@
         <span class="sha-block">
             {{ commit.parents|count }}
             parent
+            {% if commit.parents %}
             <a href="{{ url_for('.commit', rev=commit.parents[0]) }}" class="sha">{{ commit.parents[0]|shortsha }}</a>
+            {% endif %}
         </span>
         {% endif %}
 

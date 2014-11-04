@@ -38,8 +38,9 @@ def log_request_response_data(app):
             response_size = response.calculate_content_length()
 
             sender.logger.info(
-                '%s [%s] %sb %03dms',
-                response.status_code, endpoint, response_size, end_time
+                '{} [{}:{}] {:,}b {:,.2f}ms'.format(
+                    response.status_code, endpoint, request.path, response_size, end_time
+                )
             )
 
             del g.__request_timer

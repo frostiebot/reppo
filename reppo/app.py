@@ -68,7 +68,7 @@ def configure_blueprints(app, blueprints):
 def configure_extensions(app):
     # -- Reppo Repo
 
-    from reppo.lib.repo import Repo
+    from reppo.repo import Repo
 
     repos = app.config['REPOS']
     app.config['REPOS'] = dict((name, Repo(path)) for name, path in repos)

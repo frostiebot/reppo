@@ -12,6 +12,8 @@ ELL = u'…'
 
 Message = namedtuple('Message', 'summary description raw_summary raw_description')
 
+Signature = namedtuple('Signature', 'email raw_email name raw_name time offset')
+
 
 class Commit(namedtuple('Commit', 'id parents author committer author_time commit_time message')):
     __slots__ = ()
@@ -51,15 +53,13 @@ def _message_from_raw(raw_message):
 
 
 def get_commit(commit):
-    author = commit.author
-    committer = commit.committer
     message = _message_from_raw(commit.message)
 
     return Commit(
         commit.hex,
         commit.parent_ids,
-        author,
-        committer,
+        commit.author,
+        commit.committer,
         commit.author.time,
         commit.committer.time,
         message

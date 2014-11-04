@@ -20,7 +20,7 @@
         {#{% for entry in day.list|sort(attribute='author_time')|reverse %}#}
         {% for entry in day.list %}
         <li class="history-entry">
-            <a href="{{ url_for('.tree', rev=entry.id) }}" class="sha-block outline-button">
+            <a href="{{ url_for('.tree', rev=entry.id, path=request.view_args.path) }}" class="sha-block outline-button">
                 <i class="fa fa-code"></i>
             </a>
             <a href="{{ url_for('.commit', rev=entry.id) }}" class="sha-block outline-button">

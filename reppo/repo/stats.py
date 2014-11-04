@@ -4,7 +4,7 @@ from itertools import groupby
 
 from yaml import safe_load
 
-with open('/home/chris/hosted/reppo/reppo/lib/languages.yaml') as f:
+with open('/home/chris/hosted/reppo/reppo/repo/languages.yaml') as f:
     LANGUAGES = safe_load(f)
 
 
