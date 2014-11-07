@@ -118,7 +118,6 @@ class Repo(object):
         return None
 
     def diff(self, commit):
-        # TODO: ensure diff.find_similar behaves (or make optional via querystring arg?)
         parent = next(iter(commit.parents), None)
         if parent:
             diff = parent.tree.diff_to_tree(commit.tree)
@@ -130,13 +129,30 @@ class Repo(object):
 
     def blame(self, commit, path):
         # TODO: Don't fully know how to work with this yet...
-        # TODO: Need blob - match blob lines with BlameHunk lines, I guess
-        # >>> dir(blame_hunk)
-        # ['__class__', '__delattr__', '__dict__', '__doc__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_blame', '_from_c', '_hunk', 'boundary', 'final_commit_id', 'final_committer', 'final_start_line_number', 'lines_in_hunk', 'orig_commit_id', 'orig_committer', 'orig_path', 'orig_start_line_number']
+        # TODO: Also need to pass back the raw blame
+        # TODO: "Newness heatmap"
+        # Maybe use self.blob, since we may actually need formatting? or at least formatting of a different type
+        blob = self._object(commit, path)
         blame = self.git.blame(path, newest_commit=commit.id)
+        for hunk in blame:
+            # Need next hunk to know when to stop
+            # next_hunk = blame.next() ... etc
+            from_line = hunk.final_start_line_number
+            # Need author (name and date) and sha
+            # Add hunk_commit to `seen_commits` (a set?) to avoid duplicate lookups (pointless optimization?)
+            hunk_commit = self.git[hunk.final_commit_id]
         # for blame_hunk in blame:
         #     yield blame_hunk
         return blame
+
+    def branches_for_commit(self, commit):
+        # TODO: does not seem possible to look for branches from commit,
+        #       unless you loop over *all* branches and iterate through
+        #       each commit and check if commit.id == target_commit.id
+        # for branch in self.branches:
+        #     if self.git.lookup_branch(branch).target == commit.id:
+        #         yield branch
+        pass
 
     def contributors(self, commit=None, path=None):
         contributors = defaultdict(int)

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import logging
-
 from flask import Blueprint
 from flask import Response
 
@@ -19,7 +17,6 @@ from reppo.utils.pagination import Pagination
 
 from .locals import repo
 
-logger = logging.getLogger(__name__)
 bp = Blueprint('repo', __name__, url_prefix='/<repo_name>')
 
 
@@ -49,12 +46,10 @@ def inject_pagination_helper():
 
 @bp.errorhandler(404)
 def not_found(error):
-    repo_before_request_messages = get_flashed_messages(
-        category_filter=[u'repo-404']
-    )
+    not_found_messages = get_flashed_messages(category_filter=[u'repo-404'])
     message = u'Nope'
-    if repo_before_request_messages:
-        message = '\n'.join(repo_before_request_messages)
+    if not_found_messages:
+        message = '\n'.join(not_found_messages)
     return message, 404
 
 
@@ -75,9 +70,8 @@ def _redirect_to_tree():
 @bp.route('/tree/<rev>/')
 @bp.route('/tree/<rev>/<path:path>')
 def tree(path=None):
-    # TODO: format commit summary and commit date for per-object latest commit in template
-    # TODO: tree should probably be a table due to latest commit now available
-    # TODO: when path is not None show button to repo.commits at far right of breadcrumb
+    # TODO: format commit summary and commit date for per-object latest commit in template (whut? cannot remember what this is about)
+    # TODO: tree should probably be a table due to latest commit now available (well, it *is*, but is currently pretty damn expensive for a large/old repo)
     # TODO: lang summary - will require walking tree completely and dumping file extensions into a set (or a defaultdict that gets passed to a Counter)
     tree = repo.tree(path)
     latest = repo.commit(path)
@@ -98,7 +92,6 @@ def tree(path=None):
 @bp.route('/commits/<rev>/<path:path>')
 def commits(path=None):
     # TODO: Make pagination cached in user session keyed by rev (pop last n revs)
-    # TODO: Recreate instance where path did not appear to be working
     page = abs(request.args.get('page', 1, type=int))
     per_page = 30
 
@@ -118,10 +111,10 @@ def commits(path=None):
 
 @bp.route('/commit/<rev>')
 def commit():
-    # TODO: see if we can get branches for commit without explosions
+    # TODO: see if we can get branches for commit without explosions (seems unpossible)
     diff = repo.diff()
     commit = repo.commit()
-    branches = None  # repo.branches_for_commit(rev)
+    branches = None
 
     return render_template(
         'commit.html',
@@ -199,4 +192,10 @@ def refs(ref_type):
 @bp.route('/contributors')
 def contributors():
     contributors = repo.contributors()
-    return u'Excuse the mess, still working on this...\n\n' + unicode(contributors)
+    from flask import Markup
+    html = Markup(u'<html><body><p>Contributions to <strong>{}</strong> as of <strong>{}</strong></p><p><em>Excuse the mess, this page is the least of my concerns</em></p><ul><li>{}</li></ul></body></html>'.format(
+        g.repo_name,
+        repo.head.shorthand,
+        u'</li><li>'.join(list('{} : {}'.format(n, c) for n, c in contributors))
+    ))
+    return html

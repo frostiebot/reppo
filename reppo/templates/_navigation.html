@@ -5,8 +5,15 @@
     {% else %}
     {% include '_breadcrumb.html' %}
     {% endif %}
-    {% else %}
+{% else %}
     {% include '_rev_selector.html' %}
     {% include '_breadcrumb.html' %}
+    {% if request.endpoint == 'repo.tree' and request.view_args.path %}
+    <div class="button-group right">
+        <a class="commits outline-button" href="{{ url_for('.commits', path=request.view_args.path) }}">
+            <i class="fa fa-lg fa-history"></i>
+        </a>
+    </div>
+    {% endif %}
 {% endif %}
 </div>

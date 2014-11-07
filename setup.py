@@ -14,13 +14,13 @@ Flask==0.10.1
 
 blinker==1.3
 
-pygit2==0.21.3
+pygit2==0.21.4
     cffi==0.8.6
         pycparser==2.10
 
 retricon==1.2.0
     pillowfight==0.2
-        Pillow==2.5.3
+        Pillow==2.6.1
 
 Pygments==1.6
 
@@ -51,7 +51,7 @@ setup(
     install_requires=[
         'Flask',            # 0.10.1
         'blinker',          # 1.3
-        'pygit2',           # 0.21.3
+        'pygit2',           # 0.21.4
         'retricon',         # 1.2.0
         'Pygments',         # 1.6
         'gevent',           # 1.0.1

@@ -14,10 +14,10 @@ from flask import g
 
 from werkzeug.local import LocalProxy
 
-# TODO: Expensive to recreate each request... Store as root object and allow for select_commit
 
 class RepoProxy(object):
     def __init__(self, repo):
+        # TODO: Expensive to recreate each request... Store as root object and allow for select_commit
         self._commit = None
 
         for name, attr in inspect.getmembers(repo):

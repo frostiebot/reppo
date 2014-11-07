@@ -8,7 +8,7 @@ from flask import request
 
 from .locals import repo
 
-endpoint_expects_rev = lambda: current_app.url_map.is_endpoint_expecting(request.endpoint, 'rev')
+endpoint_expects_rev = lambda e: current_app.url_map.is_endpoint_expecting(e, 'rev')
 
 
 def init_repo_handlers(state):
@@ -23,27 +23,21 @@ def _repo_url_defaults(endpoint, values):
     if 'rev' in values or not g.rev:
         return
 
-    if endpoint_expects_rev:
+    if endpoint_expects_rev(endpoint):
         values['rev'] = g.rev
 
 
 def _repo_url_value_preprocessor(endpoint, values):
-    # TODO: Had a vague flash of insight into maybe checking endpoint expecting rev here and set repo.head.shorthand?
     g.repo_name = values.pop('repo_name', None)
     g.rev = values.pop('rev', None)
 
 
 def _before_request_check_repo_and_rev():
-    if not repo:
-        flash(
-            u'Repo with name "{}" not found'.format(g.repo_name),
-            u'repo-404'
-        )
-        abort(404)
+    not_found = any((
+        (not repo),
+        (repo and endpoint_expects_rev(request.endpoint) and not repo.select_commit(g.rev))
+    ))
 
-    if endpoint_expects_rev() and not repo.select_commit(g.rev):
-        flash(
-            u'Commit for rev "{}" in the "{}" repo not found'.format(g.rev, g.repo_name),
-            u'repo-404'
-        )
+    if not_found:
+        flash(u'The page you are looking for does not exist.', u'repo-404')
         abort(404)
